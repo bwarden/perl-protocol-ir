@@ -1,0 +1,53 @@
+name: Perl CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: "Perl ${{ matrix.perl }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # MIN_PERL_VERSION is 5.010; very old releases are hard to build on
+        # current runners, so cover the maintained range plus the newest.
+        perl: ['5.18', '5.24', '5.30', '5.36', '5.40']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Perl
+        uses: perl-actions/setup-perl@v2
+        with:
+          version: ${{ matrix.perl }}
+
+      - name: Install dependencies
+        run: cpanm --installdeps --notest .
+
+      - name: Build
+        run: |
+          perl Makefile.PL
+          make
+
+      # Exactly what a user's `cpanm IR::Code` runs. Only install-time tests
+      # must pass here; author tests are skipped (AUTHOR_TESTING unset).
+      - name: Install-mode tests
+        run: make test
+
+      # Author/release checks: POD validity, MANIFEST in sync, version
+      # consistency. These must pass in PRs but are meaningless at install.
+      - name: Author tests
+        env:
+          AUTHOR_TESTING: '1'
+        run: make test
+
+      # Prove the tarball that would actually be released builds and passes.
+      - name: Verify distribution tarball
+        run: |
+          make disttest
+          make dist

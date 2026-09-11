@@ -1,0 +1,95 @@
+Revision history for Protocol::IR::Code
+
+0.04    dev
+    - Added Protocol::IR::Format::LIRC: import and export of LIRC remote
+      definition files (.lircd.conf), supporting both protocol-based
+      (SPACE_ENC with timing parameters and pre_data/post_data) and
+      raw_codes modes; known protocols (NEC, Samsung, JVC) get timing
+      templates for clean export, while raw-code imports preserve
+      timings for lossless re-export
+    - Renamed the distribution and every module from the IR::* namespace to
+      Protocol::IR::* (IR::Code becomes Protocol::IR::Code, IR::Format::*
+      becomes Protocol::IR::Format::*, IR::Protocol::* becomes
+      Protocol::IR::Protocol::*), so the module tree mirrors the new top
+      level. Use statements, POD, tests, examples, and the bin/ tools all
+      follow; the distribution name in Makefile.PL is now
+      Protocol::IR::Code
+    - Protocol::IR::Format::Tasmota now imports structured IRrecv lines ("Protocol =
+      ..., Bits = ..., Data = 0x..." or decimal) in addition to RawData, and
+      import_format('Tasmota', $dump) reads every signal from a multi-line
+      IRrecv/IRsend capture log, so a whole Tasmota log converts to a single
+      WIG without editing
+    - Added bin/ir-tasmota2wig: converts a Tasmota IRrecv/IRsend capture log
+      (file or stdin) to a HAIR WIG JSON file; --name and --kind set the
+      device metadata, raw signals get decoded to Pronto Hex with their
+      hex Data as an alias
+    - Added per-protocol conversion fixtures in t/data/conv-*.tsv (NEC,
+      NEC2, JVC, SAMSUNG, NECX1, NECX2) as hand-editable reference data, a
+      data-driven two-direction test (t/17) that checks both structured ->
+      Pronto and Pronto -> structured against the files, and
+      tools/gen_conversion_fixtures.pl to regenerate them wholesale
+    - Conversion fixtures document the honest timing decode for frame
+      variants that share a signature: NEC2 decodes back as NEC, and the
+      half-header NECX1/NECX2 decode as SAMSUNG with bit-reversed
+      address/command bytes
+    - Reorganized protocol handlers under Protocol::IR::Proto::* namespace
+      (Protocol::IR::Proto::NEC, Protocol::IR::Proto::JVC48, ...), keeping
+      Protocol::IR::Code as the core IR object type and Code::Converter as
+      the registration hub; all use statements, POD, tests, and MANIFEST
+      updated
+    - Added 48-bit NEC family handlers (48-NEC1 and 48-NEC2), JVC-48,
+      SAMSUNG36, and SAMSUNG20, mirroring the ir-remote-tools TypeScript
+      handlers and the IRremoteESP8266 sendNEC48/sendSamsung36 decoders
+
+0.03    2026-08-09
+    - Added two installable command-line tools (EXE_FILES):
+      ir-irdb2wig converts an IRDB CSV file to a HAIR WIG JSON file,
+      either from a local file or by downloading it from the IRDB
+      repository by device path (manufacturer/devicetype/device,subdevice,
+      as per the IRDB naming convention); ir-convert converts between the
+      supported formats (CSV, WIG, Pronto, Tasmota) from files or stdin
+    - Protocol::IR::Format::CSV now skips rows whose protocol is unregistered or
+      whose value cannot be decoded, instead of aborting the whole import;
+      real IRDB files routinely mix in protocols this distribution does
+      not handle yet
+    - Converted documentation to POD in all modules (per-module NAME,
+      SYNOPSIS, DESCRIPTION, METHODS, and LGPL-2.1 license sections) and
+      removed the top-level README.md in favor of the POD
+    - Added GitHub Actions CI (.github/workflows/ci.yml): a multi-Perl test
+      matrix that runs both install-mode and author tests plus a
+      make dist/disttest sanity check on every PR; added an optional
+      release workflow that uploads tagged releases to PAUSE
+    - Split the test suite into install-mode tests (must always pass) and
+      author tests gated by AUTHOR_TESTING=1 (POD validity, MANIFEST sync,
+      version consistency), so author-time checks can never break a user's
+      installation
+    - Ordered the tests so generic/package-wide tests come first (t/00-t/07)
+      and feature tests are appended at the end (t/08+), so a new protocol
+      or format adds a test without renumbering anything
+    - Added maint/release.sh and maint/RELEASE.md documenting the release
+      process (version bump, disttest, make dist, PAUSE upload)
+    - All modules now share a single distribution version
+
+0.02    2026-08-09
+    - Added SAMSUNG protocol handler (32-bit customer/command framing)
+    - Added Tasmota format: import compact letter and comma-separated
+      RawData (including "IRSend <freq>,<raw>" command lines), export as
+      compact or comma IRSend commands with optional frequency
+    - Protocol::IR::Code now retains raw timing data ("timings") so captures can be
+      re-exported losslessly
+    - NEC and JVC decoders validate the frame's stop bit to avoid
+      misidentifying signals from overlapping protocols
+    - Protocol::IR::Converter::export_code passes options through to format exporters
+    - Added tests for SAMSUNG (t/10), Tasmota (t/12), IRDB CSV
+      samples (t/05), and Tasmota/Pronto/WIG cross-format
+      exactness (t/04); extended the NEC/JVC/WIG/roundtrip/load tests
+    - Bundled real capture fixtures in t/data/ (Tasmota IR captures and
+      IRDB CSVs); the suite also validates any user-provided Tasmota logs
+      matching samples/tasmota*.log
+
+0.01    2026-08-09
+    - Initial release
+    - Reorganized into a standard CPAN distribution layout (lib/, t/, examples/)
+    - Added Test::More-based test suite
+    - Added WIG import/export for the HAIR Home Assistant integration (hair-wig/3)
+    - Licensed under LGPL-2.1 to permit borrowing from IRremoteESP8266
