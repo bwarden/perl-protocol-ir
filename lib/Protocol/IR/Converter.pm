@@ -20,6 +20,7 @@ use Protocol::IR::Proto::MWM;
 use Protocol::IR::Format::Pronto;
 use Protocol::IR::Format::CSV;
 use Protocol::IR::Format::WIG;
+use Protocol::IR::Format::GC;
 use Protocol::IR::Format::Tasmota;
 use Protocol::IR::Format::Mode2;
 use Protocol::IR::Format::LIRC;
@@ -92,6 +93,8 @@ sub new {
     $self->register_format('Pronto', 'Protocol::IR::Format::Pronto');
     $self->register_format('CSV',    'Protocol::IR::Format::CSV');
     $self->register_format('WIG',    'Protocol::IR::Format::WIG');
+    $self->register_format('GCIR',       'Protocol::IR::Format::GC');
+    $self->register_format('GlobalCache','Protocol::IR::Format::GC');
     $self->register_format('Tasmota','Protocol::IR::Format::Tasmota');
     $self->register_format('Mode2',  'Protocol::IR::Format::Mode2');
     $self->register_format('LIRC',   'Protocol::IR::Format::LIRC');
