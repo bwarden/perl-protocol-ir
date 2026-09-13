@@ -171,6 +171,35 @@ sub import_code {
     }
 }
 
+# Import a transmitted frame value in a named byte order, mirroring the JS
+# importLsb/importMsb and the LIRC/Tasmota routing.  When $lsb is true the
+# value is the accumulated form (Tasmota DataLSB); when false it is the
+# display form (Tasmota Data).  Protocols with a byte-order distinction
+# translate so the decoded address/subaddress/command always matches the
+# transmitted bytes; protocols without one decode the value as-is.
+sub _import_byte_order {
+    my ($self, $protocol_name, $input, $lsb) = @_;
+    my $proto_class = $self->get_protocol($protocol_name);
+    die "Unsupported protocol: $protocol_name\n" unless $proto_class;
+
+    if ($proto_class->can('decode_byte_order')) {
+        return $proto_class->decode_byte_order($input, $lsb);
+    }
+    return $proto_class->decode_raw($input);
+}
+
+# Import from the accumulated value (Tasmota DataLSB).
+sub import_lsb {
+    my ($self, $protocol_name, $input) = @_;
+    return $self->_import_byte_order($protocol_name, $input, 1);
+}
+
+# Import from the display value (Tasmota Data).
+sub import_msb {
+    my ($self, $protocol_name, $input) = @_;
+    return $self->_import_byte_order($protocol_name, $input, 0);
+}
+
 sub export_code {
     my ($self, $ir_code, $format_name, %opts) = @_;
     my $format_class = $self->{formats}{uc $format_name};

@@ -62,16 +62,35 @@ is($converter->import_format('Tasmota', $irsend)->[0]->protocol,
     'UNKNOWN', 'IRSend frequency prefix is stripped');
 
 # --- protocol-structured lines -------------------------------------------
-my $struct = "IRrecv: Protocol = NEC, Bits = 32, Data = 0x10EF00FF";
+# In a Tasmota IRrecv line "Data" is IRremoteESP8266's decoded value, which
+# for the per-byte LSB-first protocols (NEC) is the accumulated form
+# (e.g. 0x08F700FF for address 0x10 / command 0xF7). Import converts it back
+# to the display word (0x10EF00FF), matching the JS port.
+my $struct = "IRrecv: Protocol = NEC, Bits = 32, Data = 0x08F700FF";
 my $s_code = $converter->import_format('Tasmota', $struct)->[0];
 is($s_code->protocol, 'NEC',      'structured line decodes by protocol name');
-is($s_code->data,     0x10EF00FF, 'structured line keeps the Data value');
-is($s_code->alias,    '0x10EF00FF', 'structured line aliases to Data hex');
+is($s_code->data,     0x10EF00FF, 'structured accumulated Data converts to the display word');
+is($s_code->alias,    '0x10EF00FF', 'structured line aliases to the display hex');
 
-my $s_ts = "17:12:31.456 IRrecv: Protocol = JVC, Bits = 16, Data = 0x030C";
+# With DataLSB present (the JSON form Tasmota publishes) DataLSB wins for the
+# per-byte reversed protocols, so the display hex flows straight through.
+my $s_j = q/{"Protocol":"NEC","Bits":32,"Data":"0x08F700FF","DataLSB":"0x10EF00FF"}/;
+my $s_j_code = $converter->import_format('Tasmota', $s_j)->[0];
+is($s_j_code->data,  0x10EF00FF, 'JSON structured line prefers DataLSB');
+is($s_j_code->alias, '0x10EF00FF', 'JSON structured line aliases to DataLSB');
+
+my $s_ts = "17:12:31.456 IRrecv: Protocol = JVC, Bits = 16, Data = 0xC030";
 my $s_jvc = $converter->import_format('Tasmota', $s_ts)->[0];
 is($s_jvc->protocol, 'JVC',   'timestamp-prefixed structured line decodes');
-is($s_jvc->alias,    '0x030C', 'JVC Data-hex alias is width-matched');
+is($s_jvc->alias,    '0x030C', 'JVC accumulated Data converts to the display hex');
+
+# SAMSUNG JSON: DataLSB is the display hex, Data the accumulated form; the
+# converter must keep the DataLSB so the button round-trips (address 0xE0).
+my $s_s = q/{"Protocol":"SAMSUNG","Bits":32,"Data":"0xE0E040BF","DataLSB":"0x070702FD"}/;
+my $s_s_code = $converter->import_format('Tasmota', $s_s)->[0];
+is($s_s_code->protocol, 'SAMSUNG', 'SAMSUNG JSON structured line decodes');
+is($s_s_code->address,  224, 'SAMSUNG DataLSB gives the display address 0xE0');
+is($s_s_code->data,     0x070702FD, 'SAMSUNG accumulated data word');
 
 # --- multi-signal console dump -------------------------------------------
 my $dump = <<'DUMP';
@@ -85,7 +104,7 @@ DUMP
 my $dump_codes = $converter->import_format('Tasmota', $dump);
 is(scalar(@$dump_codes), 2, 'dump decodes the supported signals, drops the rest');
 is($dump_codes->[0]->protocol, 'NEC',        'dump first signal is structured NEC');
-is($dump_codes->[0]->alias,    '0x10EF00FF', 'dump NEC alias is its Data hex');
+is($dump_codes->[0]->alias,    '0x08F700FF', 'dump NEC alias keeps the accumulated Data hex');
 is($dump_codes->[1]->protocol, 'JVC',        'dump second signal is raw JVC data');
 is($dump_codes->[1]->alias,    '0x0317',     'dump JVC alias comes from decoded data');
 

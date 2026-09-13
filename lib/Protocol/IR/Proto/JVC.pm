@@ -46,6 +46,37 @@ sub decode_raw {
     );
 }
 
+# True when the value decode_raw reads (Tasmota DataLSB) is the accumulated
+# per-byte LSB-first wire form; the display form (Tasmota Data) is its
+# per-byte bit reversal.
+sub lsb_is_accumulated { 1 }
+
+# Reverse the bits within each byte of a $bits-bit value, keeping the byte
+# order. Each frame byte is sent LSB-first, so this maps between the
+# accumulated wire form (Tasmota Data, the "LSB" form the LIRC
+# pre_data/post_data composition lands on) and the display form decode_raw
+# reads (Tasmota DataLSB).
+sub _bit_reverse_bytes {
+    my ($val, $bits) = @_;
+    my $out = 0;
+    for my $i (0 .. $bits - 1) {
+        my $byte = int($i / 8);
+        my $bit  = $i % 8;
+        my $src  = 8 * $byte + (7 - $bit);
+        $out |= (($val >> $src) & 1) << $i;
+    }
+    return $out;
+}
+
+# lsb=true is the form decode_raw reads (Tasmota DataLSB);
+# lsb=false is the accumulated wire form, reached from the display form by
+# reversing the bits within each byte.
+sub decode_byte_order {
+    my ($class, $raw_val, $lsb) = @_;
+    my $val = _parse_int($raw_val);
+    return $class->decode_raw($lsb ? $val : _bit_reverse_bytes($val, 16));
+}
+
 # Decode microsecond timing pairs into Protocol::IR::Code
 sub decode_timing {
     my ($class, $burst_pairs) = @_;
@@ -171,6 +202,23 @@ frame structure is rejected rather than misidentified.
     my $code = $class->decode_raw('0x030C');
 
 Builds an L<Protocol::IR::Code> from the raw 16-bit value.
+
+=head2 decode_byte_order
+
+    my $code = $class->decode_byte_order($raw, $lsb);
+
+Decodes from either byte order: C<$lsb> true reads the accumulated (DataLSB)
+form directly; false reads the display (Data) form, the per-byte bit reversal
+of the accumulated word. JVC sends each byte LSB-first, so the accumulated
+word is the one carried on the wire and by Tasmota's C<DataLSB>.
+
+=head2 lsb_is_accumulated
+
+    my $flag = $class->lsb_is_accumulated;
+
+True (always, for JVC) when the accumulated byte order is what
+C<decode_raw> reads, informing the Tasmota structured importer which of its
+C<Data>/C<DataLSB> fields to prefer.
 
 =head2 decode_params
 

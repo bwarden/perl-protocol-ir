@@ -98,13 +98,21 @@ sub decode_raw {
     # decodeRaw expects the display form (Tasmota Data): the frame bytes are
     # bit-reversed on the wire, so each byte in the display form must be
     # reversed to reach the accumulated / IRDB convention for address and command.
+    my $addr = _reverse_byte(($val >> 24) & 0xFF);
+    my $sub  = _reverse_byte(($val >> 16) & 0xFF);
+    my $cmd  = _reverse_byte(($val >> 8) & 0xFF);
+
+    # Re-pack the canonical accumulated word via _encode_data rather than
+    # storing the display word as-is, so the DataLSB import and the Data
+    # import land on the same data value (matching the other protocols and
+    # the JS port, where decode_raw routes through decode_params).
     return Protocol::IR::Code->new(
         protocol   => 'PANASONIC',
         bits       => BITS,
-        address    => _reverse_byte(($val >> 24) & 0xFF),
-        subaddress => _reverse_byte(($val >> 16) & 0xFF),
-        command    => _reverse_byte(($val >> 8) & 0xFF),
-        data       => $val,
+        address    => $addr,
+        subaddress => $sub,
+        command    => $cmd,
+        data       => _encode_data($addr, $sub, $cmd),
     );
 }
 

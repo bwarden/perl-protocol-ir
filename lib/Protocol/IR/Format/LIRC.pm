@@ -251,6 +251,7 @@ sub _decode_protocol_codes {
 
         # Construct the full data word from pre_data, value, post_data
         my $full_data = $value;
+        my $had_pre_post = ($pre_data_bits > 0 || $post_data_bits > 0);
         if ($pre_data_bits > 0) {
             $full_data = ($pre_data << $bits) | $full_data;
         }
@@ -259,14 +260,32 @@ sub _decode_protocol_codes {
         }
 
         my $code;
-        $code = Protocol::IR::Code->new(
-            protocol => $proto // 'UNKNOWN',
-            bits     => $bits + $pre_data_bits + $post_data_bits,
-            data     => $full_data,
-        );
+        my $proto_class = $proto ? $registry->get_protocol($proto) : undef;
+        if ($proto_class) {
+            # A code composed from pre_data/post_data carries the wire's
+            # accumulated byte order (e.g. NEC 0xC10000FF from pre_data 0xC100
+            # and a 16-bit value 0x00FF) and must be reduced to the display
+            # form via decode_byte_order (as the JS port and the rm-sg20 case
+            # do) to land on the real address/subaddress/command instead of
+            # treating the accumulated bytes as the fields. A plain
+            # codes-section value is already in its final form, so it keeps
+            # the raw decode_raw path.
+            if ($had_pre_post && $proto_class->can('decode_byte_order')) {
+                $code = $proto_class->decode_byte_order($full_data, 0);
+            } elsif ($proto_class->can('decode_raw')) {
+                $code = $proto_class->decode_raw($full_data);
+            }
+        }
+        unless ($code) {
+            $code = Protocol::IR::Code->new(
+                protocol => $proto // 'UNKNOWN',
+                bits     => $bits + $pre_data_bits + $post_data_bits,
+                data     => $full_data,
+            );
+        }
 
-        $code->alias($button_name) if $code;
-        push @codes, $code if $code;
+        $code->alias($button_name);
+        push @codes, $code;
     }
 
     return @codes;
@@ -423,7 +442,7 @@ sub _export_protocol_remote {
     $out .= "\n      begin codes\n";
     for my $code (@$codes) {
         my $name = $code->alias // 'UNKNOWN';
-        my $val = _lirc_code_value($code, $template);
+        my $val = _lirc_code_value($code, $template, $registry);
         $out .= sprintf("          %-20s %s\n", $name, $val);
     }
     $out .= "      end codes\n\n";
@@ -488,16 +507,48 @@ sub _export_raw_remote {
 }
 
 # Extract the button value for a protocol-based LIRC code.
+#
+# A code's stored data may be the accumulated wire form (e.g. SAMSUNG
+# 0x070702FD) rather than the display form LIRC carries (0xE0E040BF). Mirror
+# the JS exporter: probe decode_raw with the stored data and, when the decoded
+# value comes back different, the stored data is accumulated and must be
+# per-byte bit-reversed to the display form.
 sub _lirc_code_value {
-    my ($code, $template) = @_;
+    my ($code, $template, $registry) = @_;
     my $data = $code->data;
     return '0x00' unless defined $data;
 
     my $bits = $template->{bits} // 32;
     my $mask = (1 << $bits) - 1;
-    my $val = ref $data && $data->can('band') ? $data->band($mask)->numify : $data & $mask;
+
+    my $raw = $data;
+    if ($registry && $code->protocol && $registry->can('get_protocol')) {
+        my $proto_class = $registry->get_protocol($code->protocol);
+        if ($proto_class && $proto_class->can('decode_raw')) {
+            my $probe = eval { $proto_class->decode_raw($data) };
+            if ($probe && defined $probe->data && $probe->data != $data) {
+                $raw = _reverse_bytes($data, $bits);
+            }
+        }
+    }
+
+    my $val = ref $raw && $raw->can('band') ? $raw->band($mask)->numify : $raw & $mask;
 
     return sprintf("0x%X", $val);
+}
+
+# Reverse the bits within each byte of a $bits-bit value, keeping the byte
+# order (the inverse of the accumulated-to-display mapping).
+sub _reverse_bytes {
+    my ($val, $bits) = @_;
+    my $out = 0;
+    for my $i (0 .. $bits - 1) {
+        my $byte = int($i / 8);
+        my $bit  = $i % 8;
+        my $src  = 8 * $byte + (7 - $bit);
+        $out |= (($val >> $src) & 1) << $i;
+    }
+    return $out;
 }
 
 sub _read_input {

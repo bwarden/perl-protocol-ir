@@ -56,6 +56,10 @@ sub _encode_data {
            ($f << 8) | ($a ^ $s ^ $f);
 }
 
+# True when the accumulated word (Tasmota DataLSB) is the form decode_raw
+# reads; the display form (Tasmota Data) is its per-byte bit reversal.
+sub lsb_is_accumulated { 1 }
+
 sub decode_raw {
     my ($class, $raw_val) = @_;
     my $val = _parse_int($raw_val);

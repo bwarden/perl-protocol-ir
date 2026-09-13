@@ -64,6 +64,22 @@ sub decode_raw {
     );
 }
 
+# True when the value decode_raw reads (Tasmota DataLSB) is the accumulated
+# per-byte LSB-first wire form; the display form (Tasmota Data) is its
+# per-byte bit reversal.
+sub lsb_is_accumulated { 1 }
+
+# lsb=true is the accumulated wire form (Tasmota DataLSB), which must be
+# per-byte bit-reversed to reach the display form decode_raw reads (Tasmota
+# Data, the hex LIRC and IRDB carry); lsb=false is that display form as-is.
+# SAMSUNG's polarity is the reverse of NEC/JVC because the P-data displayed
+# hexes (0xE0E040BF) are already the display form, not decode_raw's input.
+sub decode_byte_order {
+    my ($class, $raw_val, $lsb) = @_;
+    my $val = _parse_int($raw_val);
+    return $class->decode_raw($lsb ? _byte_reverse($val) : $val);
+}
+
 sub decode_params {
     my ($class, %args) = @_;
     my $addr = _parse_int($args{address} // $args{device} // 0) & 0xFF;
@@ -245,7 +261,25 @@ C<kSamsungOneSpace> = 3 * 560 us, C<kSamsungZeroSpace> = 560 us, 32 bits.
 
     my $code = $class->decode_raw('0xE0E09966');
 
-Builds an L<Protocol::IR::Code> from the raw 32-bit MSB display value.
+Builds an L<Protocol::IR::Code> from the raw 32-bit value.
+
+=head2 decode_byte_order
+
+    my $code = $class->decode_byte_order($raw, $lsb);
+
+Decodes from either byte order: C<$lsb> true reads the accumulated (DataLSB)
+form; false reads the display (Data) form, and reverses the bytes to reach it.
+Samsung is the opposite of NEC's polarity: C<decode_raw> reads the display
+form directly (its C<data> field carries the accumulated word), so C<$lsb>
+false needs no reversal and true reverses once.
+
+=head2 lsb_is_accumulated
+
+    my $flag = $class->lsb_is_accumulated;
+
+True (always, for SAMSUNG) when the accumulated byte order is what
+C<decode_raw> reads, informing the Tasmota structured importer which of its
+C<Data>/C<DataLSB> fields to prefer.
 
 =head2 decode_params
 

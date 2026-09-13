@@ -72,6 +72,38 @@ sub decode_raw {
     );
 }
 
+# True when the value decode_raw reads (Tasmota DataLSB) is the accumulated
+# per-byte LSB-first wire form; the display form (Tasmota Data) is its
+# per-byte bit reversal.
+sub lsb_is_accumulated { 1 }
+
+# Reverse the bits within each byte of a $bits-bit value, keeping the byte
+# order. Each frame byte is sent LSB-first, so this maps between the
+# accumulated value a receiver collects (Tasmota DataLSB, the "LSB" form the
+# LIRC pre_data/post_data composition lands on) and the display form decode_raw
+# reads. Arithmetic shifts rather than the 32-bit bitwise ops, so wide words
+# survive whole.
+sub _bit_reverse_bytes {
+    my ($val, $bits) = @_;
+    my $out = 0;
+    for my $i (0 .. $bits - 1) {
+        my $byte = int($i / 8);
+        my $bit  = $i % 8;
+        my $src  = 8 * $byte + (7 - $bit);
+        $out |= (($val >> $src) & 1) << $i;
+    }
+    return $out;
+}
+
+# lsb=true is the form decode_raw reads (Tasmota DataLSB, the display hex);
+# lsb=false is the accumulated wire form (Tasmota Data), reached from the
+# display form by reversing the bits within each byte.
+sub decode_byte_order {
+    my ($class, $raw_val, $lsb) = @_;
+    my $val = _parse_int($raw_val);
+    return $class->decode_raw($lsb ? $val : _bit_reverse_bytes($val, 32));
+}
+
 sub decode_params {
     my ($class, %args) = @_;
     my $addr    = _parse_int($args{address} // $args{device} // 0);
@@ -304,6 +336,24 @@ starts with a similar header) is rejected rather than misidentified.
     my $code = $class->decode_raw('0x10EF00FF');
 
 Builds an L<Protocol::IR::Code> from the raw 32-bit value.
+
+=head2 decode_byte_order
+
+    my $code = $class->decode_byte_order($raw, $lsb);
+
+Decodes from either byte order: C<$lsb> true reads the accumulated (DataLSB)
+form directly; false reads the display (Data) form, the per-byte bit reversal
+of the accumulated word (the Tasmota C<Data> field and the IRDB C<Code>
+column). NEC sends each byte LSB-first, so the accumulated word is the one
+carried on the wire and by Tasmota's C<DataLSB>.
+
+=head2 lsb_is_accumulated
+
+    my $flag = $class->lsb_is_accumulated;
+
+True (always, for NEC) when the accumulated byte order is what
+C<decode_raw> reads, informing the Tasmota structured importer which of its
+C<Data>/C<DataLSB> fields to prefer.
 
 =head2 decode_params
 

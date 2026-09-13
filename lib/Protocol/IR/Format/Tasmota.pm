@@ -125,14 +125,19 @@ sub decode {
     return $class->decode_dump($input, $registry)
         if !ref $input && $input =~ /[\r\n]/;
 
-    # A protocol-structured line ("Protocol = NEC, Bits = 32, Data = 0x...")
-    # imports through the named protocol rather than by timing decode.
+    # A protocol-structured line ("Protocol = NEC, Bits = 32, Data = 0x...",
+    # or the JSON form Tasmota publishes over MQTT) imports through the named
+    # protocol rather than by timing decode, preferring DataLSB for the
+    # per-byte LSB-first protocols exactly as the JS port does.
     if (!ref $input) {
-        my ($proto, $data) = _parse_structured($input);
+        my ($proto, $data, $data_lsb) = _parse_structured($input);
         if (defined $proto) {
-            my $code = $registry->import_code($proto, $data);
-            $code->alias(_data_alias($code)) unless $code->alias;
-            return [$code];
+            my $code = $class->_import_structured($proto, $data, $data_lsb, $registry);
+            if ($code) {
+                $code->alias(_data_alias($code)) unless $code->alias;
+                return [$code];
+            }
+            return [];
         }
     }
 
@@ -159,17 +164,42 @@ sub decode {
     return [$code];
 }
 
-# Parse a Tasmota IRrecv protocol-structured line:
-#   IRrecv: Protocol = NEC, Bits = 32, Data = 0x10EF00FF
-# (possibly with a leading timestamp). Returns the protocol name and the
-# Data token, or an empty list when the line is not structured.
+# Parse a Tasmota IRrecv protocol-structured record, in either the console
+# log form ("Protocol = NEC, Bits = 32, Data = 0x10EF00FF") or the JSON form
+# Tasmota publishes ("Protocol":"NEC","Data":"0x10EF00FF","DataLSB":
+# "0x08F700FF"). Returns the protocol name, the Data token, and the DataLSB
+# token (or undef when absent), or an empty list when the line is not
+# structured.
 sub _parse_structured {
     my ($text) = @_;
-    my ($proto) = $text =~ /\bProtocol\s*=\s*([A-Za-z][A-Za-z0-9_]*)/i
+    my ($proto) = $text =~ /\bProtocol"?\s*[=:]\s*"?([A-Za-z][A-Za-z0-9_-]*)"?/i
         or return ();
-    my ($data)  = $text =~ /\bData\s*=\s*(0[xX][0-9A-Fa-f]+|\d+)/i
+    my ($data)  = $text =~ /\bData"?\s*[=:]\s*"?((?:0[xX])?[0-9A-Fa-f]+)"?/i
         or return ();
-    return ($proto, $data);
+    my ($data_lsb) = $text =~ /\bDataLSB"?\s*[=:]\s*"?((?:0[xX])?[0-9A-Fa-f]+)"?/i;
+    return ($proto, $data, $data_lsb);
+}
+
+# Import a structured record's fields through the named protocol, mirroring
+# the JS decodeRecord routing. Tasmota's "Data" is IRremoteESP8266's decoded
+# value and "DataLSB" the per-byte bit reversal Tasmota computes from it; for
+# the protocols that transmit each byte LSB-first (NEC, JVC, SAMSUNG) that
+# reversal is the accumulated form decode_raw reads, so DataLSB wins, while
+# for whole-word MSB-first protocols (SAMSUNG36) Data itself is the
+# accumulated form. Returns undef for an unregistered protocol name.
+sub _import_structured {
+    my ($class, $proto, $data, $data_lsb, $registry) = @_;
+    my $proto_class = $registry->get_protocol($proto);
+    return undef unless $proto_class;
+
+    my $lsb_is_accumulated = 1;
+    $lsb_is_accumulated = $proto_class->lsb_is_accumulated
+        if $proto_class->can('lsb_is_accumulated');
+
+    if ($lsb_is_accumulated && defined $data_lsb) {
+        return $registry->import_lsb($proto, $data_lsb);
+    }
+    return $registry->import_msb($proto, $data);
 }
 
 # The button-name substitute used when a capture has no known key name: the
@@ -205,7 +235,7 @@ sub decode_dump {
         next unless $line;
 
         my $signal;
-        if ($line =~ /\bProtocol\s*=/i) {
+        if ($line =~ /\bProtocol\s*[=:]/i) {
             $signal = $line;
         } elsif ($line =~ /\bRawData\s*=\s*(.+)$/i) {
             $signal = $1;

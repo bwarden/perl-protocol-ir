@@ -44,6 +44,10 @@ sub _parse_int {
     return Math::BigInt->new($val);
 }
 
+# MWM is a serial protocol, not an IR on-air byte stream: there is no
+# display/accumulated byte-order distinction, so the value is used as-is.
+sub lsb_is_accumulated { 0 }
+
 sub decode_raw {
     my ($class, $raw_val) = @_;
     my $val = _parse_int($raw_val);

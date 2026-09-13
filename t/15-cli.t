@@ -107,7 +107,7 @@ DUMP
     is($wig->{kind}, 'tv', 'kind set');
     is($wig->{origin}, 'converted:tasmota', 'origin stamp set');
     is(scalar(@{ $wig->{signals} }), 2, 'both signals converted');
-    is($wig->{signals}[0]{alias}, '0x10EF00FF', 'structured signal aliased to Data hex');
+    is($wig->{signals}[0]{alias}, '0x08F700FF', 'structured signal keeps the accumulated Data hex');
     is($wig->{signals}[1]{alias}, '0x0317', 'raw signal aliased to decoded Data hex');
     like($wig->{signals}[0]{pronto}, qr/^0000 /, 'signals carry Pronto hex');
 };

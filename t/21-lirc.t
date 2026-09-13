@@ -25,13 +25,13 @@ subtest 'import Samsung LIRC remote' => sub {
     my ($power) = grep { $_->alias eq 'KEY_POWER' } @$codes;
     ok($power, 'found KEY_POWER');
     is($power->protocol, 'SAMSUNG', 'POWER decoded as SAMSUNG');
-    is($power->data, 0xE0E040BF, 'POWER full 32-bit data matches pre_data|code');
+    is($power->data, 0x070702FD, 'POWER lands on the accumulated word (pre_data|code per-byte reversed)');
 
     # Check another button
     my ($volup) = grep { $_->alias eq 'KEY_VOLUMEUP' } @$codes;
     ok($volup, 'found KEY_VOLUMEUP');
     is($volup->protocol, 'SAMSUNG', 'VOLUMEUP decoded as SAMSUNG');
-    is($volup->data, 0xE0E0E01F, 'VOLUMEUP full 32-bit data');
+    is($volup->data, 0x070707F8, 'VOLUMEUP accumulated word');
 };
 
 # --- Import: minimal inline LIRC ----------------------------------------
@@ -68,6 +68,51 @@ LIRC
 
     is($codes->[1]->alias, 'KEY_VOLUP', 'second button alias');
     is($codes->[1]->data, 0x10EF40BF, 'second NEC data');
+};
+
+# --- Import: NEC with 16-bit pre_data (RM-SG20/accumulated bytes) ---------
+
+# A NEC signalling remote whose LIRC file carries pre_data in accumulated byte
+# order (pre_data 0xC100 with 16-bit values 0x00FF) used to decode straight
+# from the composed word 0xC10000FF and land on address 0xC1. The composed
+# word must be reduced to the display form (0x830000FF / address 131) exactly
+# as the JS port and the rm-sg20 samples do.
+subtest 'import NEC pre_data accumulated (rm-sg20)' => sub {
+    my $lirc = <<'LIRC';
+begin remote
+  name  RM_SG20_NEC
+  bits           16
+  flags SPACE_ENC
+  eps            25
+  aeps          100
+  header       9102  4396
+  one           638  1586
+  zero          638   462
+  ptrail        638
+  pre_data_bits  16
+  pre_data       0xC100
+  gap          45584
+  toggle_bit      0
+      begin codes
+          KEY_POWER       0x00FF
+          KEY_BAND        0x0100
+      end codes
+end remote
+LIRC
+
+    my $codes = $converter->import_format('LIRC', $lirc);
+    ok($codes && @$codes == 2, 'decoded 2 NEC buttons');
+
+    my ($power) = grep { $_->alias eq 'KEY_POWER' } @$codes;
+    ok($power, 'found KEY_POWER');
+    is($power->protocol, 'NEC', 'NEC timing inferred');
+    is($power->address, 131, 'KEY_POWER address is the display byte 0x83');
+    is($power->command, 0,   'KEY_POWER command');
+    is($power->data, 0x830000FF, 'KEY_POWER data is the display-form word');
+
+    my ($band) = grep { $_->alias eq 'KEY_BAND' } @$codes;
+    ok($band, 'found KEY_BAND');
+    is($band->address,   131, 'KEY_BAND address still the display byte 0x83');
 };
 
 # --- Import: Bose remote (unknown protocol, timing-based decode) ---------
@@ -182,15 +227,17 @@ subtest 'export NEC code to LIRC' => sub {
 # --- Export: Samsung code to LIRC ---------------------------------------
 
 subtest 'export Samsung code to LIRC' => sub {
-    my $code = Protocol::IR::Code->new(
-        protocol => 'SAMSUNG', bits => 32, data => 0xE0E040BF,
-    );
+    # Build through the converter so the code carries proper address/command
+    # fields and the accumulated data word, as Import/CSV/Pronto do; a raw
+    # Code->new with a display hex and no fields would be probed, detected as
+    # accumulated, and reversed on export instead of passing through.
+    my $code = $converter->import_code('SAMSUNG', '0xE0E040BF');
     $code->alias('KEY_POWER');
 
     my $lirc = $converter->export_code($code, 'LIRC', name => 'SamsungTV');
     like($lirc, qr/bits\s+32/, '32-bit Samsung');
     like($lirc, qr/header\s+4500\s+4500/, 'Samsung header timings');
-    like($lirc, qr/KEY_POWER\s+0xE0E040BF/, 'button value (full 32-bit)');
+    like($lirc, qr/KEY_POWER\s+0xE0E040BF/, 'button value (display form)');
 };
 
 # --- Roundtrip: Samsung LIRC import -> export ---------------------------
