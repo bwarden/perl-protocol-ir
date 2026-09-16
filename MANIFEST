@@ -69,8 +69,11 @@ t/data/conv-samsung36.tsv
 t/data/irdb-jvc-vcr.csv
 t/data/irdb-nec-receiver.csv
 t/data/irdb-samsung-tv.csv
+t/data/irdb-vizio-Unknown_VX37L-4,-1.csv
 t/data/lirc-jvc-vcr.lircd.conf
 t/data/lirc-samsung-tv.lircd.conf
+t/data/lirc-vizio-LCD_TV.lircd.conf
+t/data/lirc-vizio-VX37L.lircd.conf
 t/data/mode2-capture.log
 t/data/mwm-tasmota-captures.log
 t/data/tasmota-captures.log

@@ -115,6 +115,89 @@ LIRC
     is($band->address,   131, 'KEY_BAND address still the display byte 0x83');
 };
 
+# --- Import: NEC with the REVERSE flag (Vizio VX37L) ----------------------
+#
+# The SAME Vizio VX37L TV key is recorded in two places: IRDB carries the
+# display form (NEC 4,-1,8 for KEY_POWER, 0x04FB08F7) and the lirc-remotes
+# vizio/VX37L conf stores each 16-bit word bit-mirrored (REVERSE flag):
+# pre_data 0xFB04 / Power 0xF708 instead of LCD_TV's non-reverse
+# pre_data 0x20DF / Power 0x10EF. The REVERSE words are the same signal
+# written backwards, so the LIRC import must mirror each word back to the
+# wire's accumulated order, then reduce to the identical display form.
+subtest 'import REVERSE LIRC remote (Vizio VX37L)' => sub {
+    my $vx37l = File::Spec->catfile($data, 'lirc-vizio-VX37L.lircd.conf');
+    my $codes = $converter->import_format('LIRC', $vx37l);
+    ok($codes && @$codes > 0, 'decoded codes from VX37L LIRC file');
+
+    my ($power) = grep { $_->alias eq 'KEY_POWER' } @$codes;
+    ok($power, 'found KEY_POWER');
+    is($power->protocol, 'NEC', 'KEY_POWER decoded as NEC');
+    is($power->bits, 32, 'full 32-bit word (16 pre_data + 16 value)');
+    is($power->address,    4, 'KEY_POWER address');
+    is($power->subaddress, -1, 'KEY_POWER subaddress (none)');
+    is($power->command,    8, 'KEY_POWER command');
+    is($power->data,       0x04FB08F7, 'REVERSE words mirrored and reduced to the display form');
+};
+
+# LIRC VX37L and the IRDB Unknown_VX37L CSV record the same NEC signal; the
+# shared buttons must agree on every field.
+subtest 'VX37L REVERSE agrees with IRDB CSV' => sub {
+    my $vx37l = File::Spec->catfile($data, 'lirc-vizio-VX37L.lircd.conf');
+    my $irdb  = File::Spec->catfile($data, 'irdb-vizio-Unknown_VX37L-4,-1.csv');
+    my $lirc  = $converter->import_format('LIRC', $vx37l);
+    my $csv   = $converter->import_format('CSV',  $irdb);
+    my (%li) = map { $_->alias => $_ } @$lirc;
+    my (%ic) = map { $_->alias => $_ } @$csv;
+
+    for my $button (['KEY_POWER', 8], ['KEY_MUTE', 9], ['KEY_VOLUMEDOWN', 3], ['KEY_VOLUMEUP', 2]) {
+        my ($alias, $cmd) = @$button;
+        my $l = $li{$alias};
+        my $i = $ic{$alias};
+        ok($l && $i, "$alias present in both files");
+        next unless $l && $i;
+        is($l->protocol,   $i->protocol,   "$alias protocol agrees");
+        is($l->address,    $i->address,    "$alias address agrees");
+        is($l->subaddress, $i->subaddress, "$alias subaddress agrees");
+        is($l->command,    $i->command,    "$alias command agrees");
+        is($l->command,    $cmd,           "$alias command value");
+        is($l->data,       $i->data,       "$alias data agrees");
+        is($l->data, 0x04FB0000 | ($cmd << 8) | (~$cmd & 0xFF), "$alias data is the display-form word");
+    }
+};
+
+# The two databases must also agree on the transmitted pulse train.
+subtest 'VX37L exports Pronto identical to IRDB' => sub {
+    my $vx37l = File::Spec->catfile($data, 'lirc-vizio-VX37L.lircd.conf');
+    my $irdb  = File::Spec->catfile($data, 'irdb-vizio-Unknown_VX37L-4,-1.csv');
+    my $lirc  = $converter->import_format('LIRC', $vx37l);
+    my $csv   = $converter->import_format('CSV',  $irdb);
+    my (%li) = map { $_->alias => $_ } @$lirc;
+    my (%ic) = map { $_->alias => $_ } @$csv;
+
+    for my $alias (qw(KEY_POWER KEY_MUTE KEY_VOLUMEDOWN KEY_VOLUMEUP)) {
+        my $l = $li{$alias};
+        my $i = $ic{$alias};
+        next unless $l && $i;
+        my $lp = $converter->export_code($l, 'Pronto');
+        my $ip = $converter->export_code($i, 'Pronto');
+        is($lp, $ip, "$alias Pronto is identical");
+    }
+};
+
+# REVERSE (VX37L) and non-REVERSE (LCD_TV) are the same NEC power signal.
+subtest 'REVERSE VX37L and non-REVERSE LCD_TV describe the same power key' => sub {
+    my $vx37l  = File::Spec->catfile($data, 'lirc-vizio-VX37L.lircd.conf');
+    my $lcdtv  = File::Spec->catfile($data, 'lirc-vizio-LCD_TV.lircd.conf');
+    my $rev    = $converter->import_format('LIRC', $vx37l);
+    my $plain  = $converter->import_format('LIRC', $lcdtv);
+    my ($r) = grep { $_->alias eq 'KEY_POWER' } @$rev;
+    my ($p) = grep { $_->alias eq 'KEY_POWER' } @$plain;
+    ok($r && $p, 'KEY_POWER present in both');
+    is($r->data,    $p->data,    'both land on the same display form');
+    is($r->address, $p->address, 'same address');
+    is($r->command, $p->command, 'same command');
+};
+
 # --- Import: Bose remote (unknown protocol, timing-based decode) ---------
 
 subtest 'import Bose SoundTouch remote' => sub {

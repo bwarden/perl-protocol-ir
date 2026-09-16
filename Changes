@@ -1,5 +1,16 @@
 Revision history for Protocol::IR::Code
 
+0.05    dev
+    - Protocol::IR::Format::LIRC: LIRC remotes flagged REVERSE store each
+      transmitted word (pre_data, post_data, and the code value) bit-mirrored
+      within its own declared width; mirror those words back to the wire's
+      accumulated order before composing the full data word so a REVERSE
+      remote decodes to the same code as the non-REVERSE form and every other
+      database. The lirc vizio/VX37L conf (REVERSE, pre_data 0xFB04 + Power
+      0xF708) now lands on NEC 4/-1/8 with data 0x04FB08F7, byte-for-byte
+      identical to IRDB's Vizio Unknown_VX37L, instead of the bit-mirrored
+      NEC 223/239 (0xDF20EF10).
+
 0.04    dev
     - Added Protocol::IR::Format::LIRC: import and export of LIRC remote
       definition files (.lircd.conf), supporting both protocol-based

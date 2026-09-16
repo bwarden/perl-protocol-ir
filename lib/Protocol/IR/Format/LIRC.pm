@@ -2,7 +2,7 @@ package Protocol::IR::Format::LIRC;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Protocol::IR::Code;
 
@@ -234,6 +234,18 @@ sub _decode_protocol_codes {
     my $post_data_bits = $remote->{post_data_bits} // 0;
     my $post_data = $remote->{post_data} // 0;
 
+    # LIRC SPACE_ENC remotes store each transmitted word (pre_data, post_data,
+    # and the code value) in the wire's accumulated byte order, whose per-byte
+    # LSB-first reading the decode_byte_order reduction below unwraps. A remote
+    # flagged REVERSE stores each word bit-mirrored within its own declared
+    # width instead -- the same signal, written backwards. Restoring the wire
+    # order first makes both encodings converge on one code: Vizio VX37L
+    # (REVERSE, pre_data 0xFB04 + Power 0xF708) and LCD_TV (no REVERSE,
+    # pre_data 0x20DF + Power 0x10EF) are the same NEC signal, the second
+    # being the 16-bit mirror of the first.
+    my $had_pre_post = ($pre_data_bits > 0 || $post_data_bits > 0);
+    my $reversed = $had_pre_post && ($remote->{flags} // '') =~ /(?:^|\|)REVERSE(?:\||$)/i;
+
     # Try to infer protocol from timing parameters
     my $proto = _infer_protocol($remote);
 
@@ -249,14 +261,19 @@ sub _decode_protocol_codes {
             $value &= $mask;
         }
 
-        # Construct the full data word from pre_data, value, post_data
-        my $full_data = $value;
-        my $had_pre_post = ($pre_data_bits > 0 || $post_data_bits > 0);
+        # Construct the full data word from pre_data, value, post_data. A
+        # REVERSE remote stores each word bit-mirrored, so mirror it back to
+        # the wire's accumulated order before combining; the decode_byte_order
+        # reduction below then unwraps the per-byte LSB-first reading for both
+        # encodings alike.
+        my $full_data = $reversed ? _mirror_word($value, $bits) : $value;
         if ($pre_data_bits > 0) {
-            $full_data = ($pre_data << $bits) | $full_data;
+            my $pre = $reversed ? _mirror_word($pre_data, $pre_data_bits) : $pre_data;
+            $full_data = ($pre << $bits) | $full_data;
         }
         if ($post_data_bits > 0) {
-            $full_data = ($full_data << $post_data_bits) | $post_data;
+            my $post = $reversed ? _mirror_word($post_data, $post_data_bits) : $post_data;
+            $full_data = ($full_data << $post_data_bits) | $post;
         }
 
         my $code;
@@ -547,6 +564,18 @@ sub _reverse_bytes {
         my $bit  = $i % 8;
         my $src  = 8 * $byte + (7 - $bit);
         $out |= (($val >> $src) & 1) << $i;
+    }
+    return $out;
+}
+
+# Mirror the $width significant bits of $word (bit $i <-> bit $width-1-$i),
+# the mapping LIRC's REVERSE flag applies to each transmitted word.
+sub _mirror_word {
+    my ($word, $width) = @_;
+    return $word if $width <= 0;
+    my $out = 0;
+    for my $i (0 .. $width - 1) {
+        $out |= (($word >> $i) & 1) << ($width - 1 - $i);
     }
     return $out;
 }
