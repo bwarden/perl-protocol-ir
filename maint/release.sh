@@ -22,7 +22,7 @@ cd "$ROOT"
 NEW_VERSION="${1:-}"
 NOTE="${2:-}"
 
-# --- current version (single source of truth: lib/IR/Code.pm) ------------
+# --- current version (single source of truth: lib/Protocol/IR/Code.pm) ------
 CURRENT="$(perl -Ilib -MProtocol::IR::Code -e 'print $Protocol::IR::Code::VERSION')"
 echo "Current version: $CURRENT"
 
@@ -36,9 +36,11 @@ if [ -n "$NEW_VERSION" ]; then
         exit 1
     fi
 
-    # Keep every module in step with the distribution version.
-    perl -pi -e "s/^our \\\$VERSION = '[0-9.]*';/our \\\$VERSION = '$NEW_VERSION';/" \
-        lib/IR/*.pm lib/IR/*/*.pm
+    # Keep every module in step with the distribution version.  The tree has
+    # always grown subdirs (Proto/, Format/), so walk lib/ rather than glob a
+    # fixed layout.
+    find lib -name '*.pm' -print0 | xargs -0 perl -pi -e \
+        "s/^our \\\$VERSION = '[0-9.]*';/our \\\$VERSION = '$NEW_VERSION';/"
 
     # Prepend a Changes entry.
     {

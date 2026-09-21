@@ -20,7 +20,8 @@ The GitHub Actions workflow `.github/workflows/ci.yml` runs both modes
 
 ## 2. Bump the version
 
-The distribution version comes from `lib/IR/Code.pm` (`VERSION_FROM`).
+The distribution version comes from `lib/Protocol/IR/Code.pm`
+(`VERSION_FROM`).
 Every module shares the same version. Bump it and build the release with
 the helper:
 
