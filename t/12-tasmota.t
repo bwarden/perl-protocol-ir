@@ -92,6 +92,19 @@ is($s_s_code->protocol, 'SAMSUNG', 'SAMSUNG JSON structured line decodes');
 is($s_s_code->address,  224, 'SAMSUNG DataLSB gives the display address 0xE0');
 is($s_s_code->data,     0x070702FD, 'SAMSUNG accumulated data word');
 
+# --- MWM bundle records import as the first frame ---------------------------
+# A structured MWM record whose Data ingests a whole A+B+A' capture decodes as
+# one code, the bundle's first frame -- the decode_raw law mirrored from the
+# JS port; the unbundle capability itself is exercised in t/19-mwm.t.
+my $bundle_dump = 'IRrecv: Protocol = MWM, Bits = 264, '
+    . 'Data = 0x96190B09088418014D9C260CD5636B58EE4803D13C07068596190B09088418014D';
+my $bundle_code = $converter->import_format('Tasmota', $bundle_dump)->[0];
+isa_ok($bundle_code, 'Protocol::IR::Code', 'bundled MWM record decodes');
+is($bundle_code->protocol, 'MWM', 'bundled MWM record protocol');
+is($bundle_code->bits, 72, 'bundled MWM record yields the first frame width');
+is($bundle_code->data->as_hex, '0x96190b09088418014d',
+    'bundled MWM record yields the first frame value');
+
 # --- multi-signal console dump -------------------------------------------
 my $dump = <<'DUMP';
 17:12:31.100 IRrecv: Protocol = NEC, Bits = 32, Data = 0x10EF00FF

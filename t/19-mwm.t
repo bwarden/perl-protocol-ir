@@ -131,6 +131,30 @@ my $wide_code = $converter->import_format('Tasmota', $wide_dump)->[0];
 assert_mwm($wide_code, '9C260CD5636B58EE4803D13C070685', 120, 'wide structured MWM record imports');
 is($wide_code->alias, '0x9C260CD5636B58EE4803D13C070685', 'wide Data hex is not truncated');
 
+# --- unbundle: a whole A+B+A' bundle splits into its three frames -------------
+my $bundle = '0x96190B09088418014D9C260CD5636B58EE4803D13C07068596190B09088418014D';
+my @parts = @{ $p->unbundle($bundle) };
+is(scalar(@parts), 3, 'unbundle splits the A+B+A\' bundle into three frames');
+assert_mwm($parts[0], '96190B09088418014D', 72, 'unbundle frame 1 is command A');
+assert_mwm($parts[1], '9C260CD5636B58EE4803D13C070685', 120, 'unbundle frame 2 is status B');
+assert_mwm($parts[2], '96190B09088418014D', 72, 'unbundle frame 3 is the A\' repeat');
+assert_mwm($p->decode_raw($bundle), '96190B09088418014D', 72,
+    'decode_raw of a bundle returns the first frame');
+
+# A lone length-declared frame is not a bundle: one width-derived code.
+my @lone = @{ $p->unbundle('0x96190B09088418014D') };
+is(scalar(@lone), 1, 'a lone 0x9x frame unbundles to a single code');
+assert_mwm($lone[0], '96190B09088418014D', 72, 'lone frame stays width-derived');
+
+# A 2-byte value pads to the 24-bit minimum in the lone fallback.
+my @tiny = @{ $p->unbundle('0x5508') };
+assert_mwm($tiny[0], '5508', 24, '2-byte value unbundles to a 24-bit code');
+
+# A walk that cannot land exactly falls back to the whole-value frame.
+my @mixed = @{ $p->unbundle('0x5508089C260CD5') };
+is(scalar(@mixed), 1, 'a non-landing walk unbundles to a single code');
+assert_mwm($mixed[0], '5508089C260CD5', 56, 'mixed value falls back to its own width');
+
 # --- to_irsend shows the full wide Data hex ----------------------------------
 is_deeply(
     $wide_code->to_irsend(),

@@ -48,10 +48,74 @@ sub _parse_int {
 # display/accumulated byte-order distinction, so the value is used as-is.
 sub lsb_is_accumulated { 0 }
 
+# A bundle is the accumulation of two or more length-declared MWM frames
+# (typically a command A, its status companion B, and a repeat A' -- all three
+# self-declare their own byte length in their leading byte, so the stream is
+# walkable without any side information). Splits the value into one Code per
+# frame. The first frame returned is the command/decode_raw frame A, which is
+# what the structured Data field of a Tasmota MWM record normally carries;
+# unbundle exists so a single structured hex tap can split a real A+B+A'
+# capture into all three of its own frames.
+sub unbundle {
+    my ($class, $raw_val) = @_;
+    my $val = _parse_int($raw_val);
+    die "MWM data must be non-negative\n" if $val->is_neg;
+
+    # Walk the value as a run of length-declared frames. 0x9x/0xFx leading
+    # nibbles declare n+3 payload bytes (byte0's low nibble declaring the byte
+    # count after the fixed 3-byte header). When the walk cannot land exactly
+    # on the value end, the value is a single bare frame (24-bit show /
+    # width-based values) and this returns the one Code built from the whole
+    # value.
+    my $hex = $val->as_hex;
+    $hex =~ s/^0x//i;
+    $hex = '0' x (6 - length($hex)) . $hex if length($hex) < 6;
+    my @bytes = map { hex($_) } ($hex =~ /(..?)/g);
+    my @frames;
+    my $pos = 0;
+    while ($pos < @bytes) {
+        my $header   = $bytes[$pos];
+        my $declared = ($header & 0x0f) + 3;
+        last if $pos + $declared > @bytes;
+        my $high = $header & 0xf0;
+        last unless $high == 0x90 || $high == 0xf0;
+        push @frames, [ @bytes[$pos .. $pos + $declared - 1] ];
+        $pos += $declared;
+    }
+    if (@frames < 2 || $pos != @bytes) {
+        # Single frame (or a non-length walk): the width-derived frame is the
+        # same one decode_raw's fallback builds -- inline that law here so a
+        # single frame never rings unbundle<->decode_raw.
+        my $digits = $val->as_hex;
+        $digits =~ s/^0x//i;
+        my $bits = int((length($digits) + 1) / 2) * 8;
+        $bits = $kMinBits if $bits < $kMinBits;
+        return [ Protocol::IR::Code->new(
+            protocol => 'MWM', bits => $bits, data => $val) ];
+    }
+    my @codes;
+    for my $frame (@frames) {
+        my $data = Math::BigInt->bzero();
+        for my $b (@$frame) { $data = ($data << 8)->badd($b); }
+        push @codes, Protocol::IR::Code->new(
+            protocol => 'MWM',
+            bits     => scalar(@$frame) * 8,
+            data     => $data,
+        );
+    }
+    return \@codes;
+}
+
 sub decode_raw {
     my ($class, $raw_val) = @_;
     my $val = _parse_int($raw_val);
     die "MWM data must be non-negative\n" if $val->is_neg;
+
+    # A structured tap that ingested a whole A+B+A' bundle asks for a single
+    # code: the bundle's first frame (A) is the command that decode_raw
+    # returns for the record's Data field.
+    my $bundled = $class->unbundle($val);
+    return $bundled->[0] if @$bundled >= 2;
 
     # The frame length is implied by the value's own width, rounded up to a
     # whole number of bytes with the 3-byte protocol minimum.

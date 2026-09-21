@@ -249,6 +249,17 @@ sub decode_dump {
         eval { $code = $class->decode($signal, $registry)->[0]; 1 }
             or next;
         next unless $code && $code->protocol ne 'UNKNOWN';
+        # A structured MWM record's Data field can carry a whole A+B+A' bundle
+        # (a "capture"), which Tasmota logged as one value -- unwrap it through
+        # the protocol's optional unbundle capability so every frame of the
+        # bundle is yielded as its own code.
+        if ($code->protocol eq 'MWM') {
+            my $proto_class = $registry->get_protocol('MWM');
+            my $bundled = $proto_class && $proto_class->can('unbundle')
+                ? $proto_class->unbundle($code->data)
+                : [];
+            if (@$bundled >= 2) { push @codes, @$bundled; next; }
+        }
         push @codes, $code;
     }
     return \@codes;
