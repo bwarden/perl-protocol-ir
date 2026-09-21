@@ -2,7 +2,7 @@ package Protocol::IR::Proto::NEC482;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 use parent 'Protocol::IR::Proto::NEC48';
 

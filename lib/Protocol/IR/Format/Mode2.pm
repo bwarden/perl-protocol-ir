@@ -2,7 +2,7 @@ package Protocol::IR::Format::Mode2;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 use Protocol::IR::Code;
 

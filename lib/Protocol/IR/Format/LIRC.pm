@@ -2,7 +2,7 @@ package Protocol::IR::Format::LIRC;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Protocol::IR::Code;
 

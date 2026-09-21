@@ -1,5 +1,17 @@
 Revision history for Protocol::IR::Code
 
+0.06    2026-09-20
+    - Protocol::IR::Proto::MWM gains an optional unbundle capability: a
+      whole A+B+A' capture that Tasmota / IRremoteESP8266 (commit 247bcdb3
+      "Decode every complete frame of a capture into one result") logs as
+      one concatenated Data value is split back into one Code per frame by
+      walking each frame's self-declared length nibble ((header & 0x0f) +
+      3, 0x9x/0xFx leading bytes); a value whose walk cannot land exactly
+      stays a single width-derived frame. decode_raw returns the bundle's
+      first frame (A), and Protocol::IR::Format::Tasmota::decode_dump
+      unwraps structured MWM records through the capability, mirroring the
+      JS port's law (web/src/lib/protocol/mwm.ts, format/tasmota.ts)
+
 0.05    dev
     - Protocol::IR::Format::LIRC: LIRC remotes flagged REVERSE store each
       transmitted word (pre_data, post_data, and the code value) bit-mirrored

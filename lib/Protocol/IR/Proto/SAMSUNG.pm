@@ -2,7 +2,7 @@ package Protocol::IR::Proto::SAMSUNG;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 use Protocol::IR::Code;
 
 # Timing and bit ordering follow IRremoteESP8266 (Copyright David Conran et al.,
