@@ -11,7 +11,7 @@ sourced.
 
 | Path          | Contents |
 |---------------|----------|
-| `lib/`        | `Protocol::IR::Code` (a decoded IR signal), `Protocol::IR::Converter` (protocol identification + format conversion), format handlers (CSV/LIRC/Mode2/Pronto/Tasmota/WIG) and protocol handlers (NEC family, JVC, Samsung, Panasonic, MWM framing). |
+| `lib/`        | `Protocol::IR::Code` (a decoded IR signal), `Protocol::IR::Converter` (protocol identification + format conversion), format handlers (CSV/LIRC/Mode2/Pronto/Tasmota/WIG/Global Cache JSON) and protocol handlers (NEC family, JVC, Samsung, Panasonic, MWM framing). |
 | `bin/`        | CLI tools: `ir-convert`, `ir-irdb2wig`, `ir-tasmota2wig`. |
 | `t/`          | Test suite (ExtUtils::MakeMaker). |
 | `docs/`       | (unused; the shared MWM protocol docs live in the python-mwm repo) |

@@ -43,10 +43,12 @@ sub decode {
     my @decoded_codes;
     for my $cmd (@{ $data->{commands} }) {
         die "GC command must be an object\n" unless ref $cmd eq 'HASH';
+        # A compact export may list commands without a Pronto payload (no
+        # signal captured for them); nothing to convert, so skip rather than
+        # fail the whole import.
+        next unless defined $cmd->{pronto} && $cmd->{pronto} ne '';
         die "GC command is missing its name\n"
             unless defined $cmd->{name} && $cmd->{name} ne '';
-        die "GC command is missing its pronto hex\n"
-            unless defined $cmd->{pronto} && $cmd->{pronto} ne '';
 
         my $code = eval { $registry->import_format('Pronto', $cmd->{pronto}) };
         die "GC command '" . $cmd->{name} . "' cannot be decoded: $@\n"
@@ -108,9 +110,10 @@ C<Protocol::IR::Format::GC> imports a Global Cache IR database JSON document
 hex payload, plus opaque C<keycode>/C<protocol> strings).  The payload is the
 same Pronto hex a HAIR wig carries, so the imported codes are identical to
 what C<import_format('WIG', ...)> would produce, and the WIG importer accepts
-this shape automatically.  Dies with a concrete reason if the JSON is
-malformed, a command is missing its name or Pronto hex, or a payload cannot
-be decoded.
+this shape automatically.  Commands that carry no Pronto payload (a compact
+export may list buttons it never captured a signal for) are skipped rather
+than failing the import.  Dies with a concrete reason if the JSON is
+malformed, a command is missing its name, or a payload cannot be decoded.
 
 Import-only: the C<keycode>/C<protocol> strings are Global Cache's own
 naming, so the format is never exported.
@@ -122,8 +125,8 @@ naming, so the format is never exported.
     my $codes = $class->decode($input, $registry);
 
 Parses a GC file path or JSON string and returns an arrayref of
-L<Protocol::IR::Code> objects, one per command, with C<alias> set from the
-command C<name>.
+L<Protocol::IR::Code> objects, one per command with a Pronto payload,
+C<alias> set from the command C<name>.
 
 =head1 AUTHOR
 

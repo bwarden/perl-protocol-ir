@@ -21,6 +21,14 @@ eval { $converter->import_format('Pronto', '1000 006D 0000 0000'); };
 like($@, qr/raw pronto/i, 'rejects non-raw format');
 
 eval { $converter->import_format('Pronto', '0000 0000 0000 0000'); };
-like($@, qr/unable to decode/i, 'rejects undecodable payload');
+like($@, qr/unable to decode/i, 'rejects undecodable (empty) payload');
+
+my $raw = $converter->import_format('Pronto', '0000 006D 0002 0000 0071 0072 0013 0013');
+is($raw->protocol, 'UNKNOWN', 'unrecognized but well-formed payload imports as UNKNOWN');
+is($raw->bypass_protocol, 1, 'raw code bypasses protocol decoding');
+is($raw->pronto, '0000 006D 0002 0000 0071 0072 0013 0013',
+    'original hex stashed verbatim');
+is($converter->export_code($raw, 'Pronto'), '0000 006D 0002 0000 0071 0072 0013 0013',
+    'raw code exports its stashed Pronto hex verbatim');
 
 done_testing;

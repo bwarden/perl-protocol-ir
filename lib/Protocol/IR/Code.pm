@@ -17,6 +17,7 @@ sub new {
         ditto_count     => $args{ditto_count}     // 0,
         bypass_protocol => $args{bypass_protocol} // 0,
         timings         => $args{timings}         // undef,
+        pronto          => $args{pronto}          // undef,
     }, $class;
 }
 
@@ -31,6 +32,7 @@ sub alias           { $_[0]->{alias}           = $_[1] if @_ > 1; $_[0]->{alias}
 sub ditto_count     { $_[0]->{ditto_count}     = $_[1] if @_ > 1; $_[0]->{ditto_count} }
 sub bypass_protocol { $_[0]->{bypass_protocol} = $_[1] if @_ > 1; $_[0]->{bypass_protocol} }
 sub timings         { $_[0]->{timings}         = $_[1] if @_ > 1; $_[0]->{timings} }
+sub pronto          { $_[0]->{pronto}          = $_[1] if @_ > 1; $_[0]->{pronto} }
 
 sub to_irsend {
     my ($self) = @_;
@@ -163,6 +165,13 @@ Flag marking that a WIG should bypass protocol-aware repeat behavior.
 When a signal is decoded from raw timing data (Pronto or Tasmota), the
 individual mark/space timings are retained here so the capture can be
 re-exported losslessly. C<undef> for codes built from decoded fields.
+
+=item pronto
+
+The original raw Pronto Hex payload of a signal no registered protocol
+recognized, stashed verbatim so the code re-exports losslessly as a raw
+(protocol C<UNKNOWN>, C<bypass_protocol> set) signal. C<undef> for codes
+built from decoded fields.
 
 =back
 

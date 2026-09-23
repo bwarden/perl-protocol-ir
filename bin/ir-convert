@@ -17,18 +17,20 @@ out in another. Every code is normalized to an Protocol::IR::Code object in betw
 so decoded signals survive the trip losslessly.
 
 Formats:
-    csv       IRDB-style button listing (import only)
-    wig       HAIR hair-wig/3 JSON, one file per remote (import/export)
-    pronto    Raw Pronto Hex, one signal per code (import/export)
-    tasmota   Tasmota IRsend raw data, one signal per line (import/export)
-    mode2     LIRC mode2 pulse/space capture, one timing per line (import/export)
-    lirc      LIRC remote definition (.lircd.conf), protocol or raw codes
+    csv          IRDB-style button listing (import only)
+    wig          HAIR hair-wig/3 JSON, one file per remote (import/export)
+    pronto       Raw Pronto Hex, one signal per code (import/export)
+    tasmota      Tasmota IRsend raw data, one signal per line (import/export)
+    mode2        LIRC mode2 pulse/space capture, one timing per line (import/export)
+    lirc         LIRC remote definition (.lircd.conf), protocol or raw codes
+    gcir         Global Cache IR JSON, "--device" control commands (import only)
+    globalcache  Alias for gcir
 
 Usage:
     ir-convert [options] --from FORMAT --to FORMAT
 
 Options:
-    --from FORMAT   Input format (required): csv, wig, pronto, tasmota, mode2, lirc
+    --from FORMAT   Input format (required): csv, wig, pronto, tasmota, mode2, lirc, gcir
     --to FORMAT     Output format (required): wig, pronto, tasmota, mode2, lirc
     --in FILE       Read input from FILE instead of stdin
     --out FILE      Write output to FILE instead of stdout
@@ -46,6 +48,7 @@ Examples:
     cat capture.tasmota | ir-convert --from tasmota --to pronto
     ir-convert --from wig --to tasmota --in remote.wig.json
     ir-convert --from lirc --to pronto --in remote.lircd.conf
+    ir-convert --from gcir --to wig --in gc.json --name "Vacuum"
 USAGE
 
 my %opt;
@@ -69,10 +72,10 @@ if ($opt{help}) {
 }
 usage_error("--from and --to are required")    unless $opt{from} && $opt{to};
 
-my %importable = map { $_ => 1 } qw(csv wig pronto tasmota mode2 lirc);
+my %importable = map { $_ => 1 } qw(csv wig pronto tasmota mode2 lirc gcir globalcache);
 my %exportable = map { $_ => 1 } qw(wig pronto tasmota mode2 lirc);
 
-usage_error("unsupported --from '" . $opt{from} . "' (choose: csv, wig, pronto, tasmota, mode2, lirc)")
+usage_error("unsupported --from '" . $opt{from} . "' (choose: csv, wig, pronto, tasmota, mode2, lirc, gcir)")
     unless $importable{lc $opt{from}};
 usage_error("unsupported or non-exportable --to '" . $opt{to} . "' (choose: wig, pronto, tasmota, mode2, lirc)")
     unless $exportable{lc $opt{to}};

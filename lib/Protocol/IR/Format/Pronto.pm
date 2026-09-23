@@ -6,6 +6,11 @@ our $VERSION = '0.06';
 
 sub export {
     my ($class, $ir_code, $registry) = @_;
+
+    # A raw/undecodable code carries its original Pronto Hex verbatim (see
+    # decode), so re-emitting it needs no protocol encoder.
+    return $ir_code->pronto if defined $ir_code->pronto;
+
     my $proto_name = $ir_code->protocol;
     my $plugin     = $registry->get_protocol($proto_name);
 
@@ -61,7 +66,26 @@ sub decode {
         }
     }
 
-    die "Unable to decode Pronto Hex string into a known protocol\n";
+    # No registered protocol matched. A payload with real timing data is
+    # still valid raw Pronto Hex, so keep it as an opaque UNKNOWN code rather
+    # than failing: container conversions that just move Pronto hex (e.g.
+    # Global Cache to WIG) must not depend on naming the protocol. The
+    # original hex is stashed verbatim (lossless re-export) and the mark/space
+    # timings are kept for the other timing formats. A truncated or empty
+    # payload is malformed, not merely unknown, and still dies.
+    die "Unable to decode Pronto Hex string into a known protocol\n"
+        unless @burst_pairs_us;
+
+    my @timings;
+    for my $pair (@burst_pairs_us) {
+        push @timings, int($pair->[0]), -int($pair->[1]);
+    }
+    return Protocol::IR::Code->new(
+        protocol        => 'UNKNOWN',
+        bypass_protocol => 1,
+        timings         => \@timings,
+        pronto          => $pronto_str,
+    );
 }
 
 1;
@@ -102,7 +126,12 @@ carrier, so the decoded microsecond timings round-trip cleanly.
 
 Because decoding works from the microsecond timing signature (see
 L<Protocol::IR::Converter/"DECODING VERSUS GENERATING TIMINGS">), a Pronto string is
-only recognized if it matches a registered protocol.
+only recognized if it matches a registered protocol. A well-formed string
+with real timing data that no protocol recognizes is not an error: it
+decodes to an opaque C<UNKNOWN> code (C<bypass_protocol> set, original hex
+stashed in C<pronto>) so container conversions that move Pronto hex (Global
+Cache to WIG, and so on) can still complete. Truncated or empty payloads are
+still rejected. C<export> re-emits the stashed hex verbatim.
 
 =head1 METHODS
 

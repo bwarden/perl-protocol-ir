@@ -84,8 +84,12 @@ like($@, qr/^GC requires a commands list/, 'rejects missing commands');
 eval { $converter->import_format('GCIR', '{"commands": []}'); };
 like($@, qr/^GC requires a commands list/, 'rejects empty commands');
 
-eval { $converter->import_format('GCIR', '{"commands": [{"name": "X"}]}'); };
-like($@, qr/missing its pronto hex/, 'rejects missing pronto');
+my $no_pronto = eval { $converter->import_format('GCIR', '{"commands": [{"name": "X"}]}'); };
+ok(!$@ && $no_pronto && @$no_pronto == 0, 'skips a command with no pronto payload');
+
+my $some_payload = $converter->import_format('GCIR',
+    '{"commands": [{"name": "X"}, {"name": "Y", "pronto": "0000 006D 0002 0000 0071 0072 0013 0013"}]}');
+is(scalar(@$some_payload), 1, 'imports payload-bearing commands, skips the rest');
 
 eval { $converter->import_format('GCIR', '{"commands": [{"name": "", "pronto": "0000 006D 0022 0000"}]}'); };
 like($@, qr/missing its name/, 'rejects empty name');
@@ -96,5 +100,63 @@ like($@, qr/cannot be decoded/, 'rejects undecodable pronto');
 # A wig-shaped document is not treated as GC.
 eval { $converter->import_format('GCIR', '{"format": "hair-wig/3", "name": "R", "signals": []}'); };
 like($@, qr/^GC requires a commands list/, 'a wig document is not GC');
+
+# --- Undecodable (unknown-protocol) payloads pass through losslessly -------
+
+# Three commands extracted from a real Global Cache export for an "Eufy 40
+# Bit" remote (no registered protocol names it). The workspace copies of the
+# files are local-only, never shipped; the payloads are embedded here so the
+# test runs from any checkout.
+my $eufy_gc_json = <<'JSON';
+{
+  "commands": [
+    {
+      "keycode": "G:Eufy 40 Bit:()(0x68A0000008)():3",
+      "name": "Auto",
+      "pronto": "0000 006D 002A 0000 0071 0072 0013 0013 0013 0039 0013 0039 0013 0013 0013 0039 0013 0013 0013 0013 0013 0013 0013 0039 0013 0013 0013 0039 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0039 0013 0013 0013 0013 0013 0013 0013 0304",
+      "protocol": "Eufy 40 Bit"
+    },
+    {
+      "keycode": "G:Eufy 40 Bit:()(0x68450632E5)():3",
+      "name": "CurrentTime",
+      "pronto": "0000 006D 002A 0000 0071 0072 0013 0013 0013 0039 0013 0039 0013 0013 0013 0039 0013 0013 0013 0013 0013 0013 0013 0013 0013 0039 0013 0013 0013 0013 0013 0013 0013 0039 0013 0013 0013 0039 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0039 0013 0039 0013 0013 0013 0013 0013 0013 0013 0039 0013 0039 0013 0013 0013 0013 0013 0039 0013 0013 0013 0039 0013 0039 0013 0039 0013 0013 0013 0013 0013 0039 0013 0013 0013 0039 0013 0304",
+      "protocol": "Eufy 40 Bit"
+    }
+  ]
+}
+JSON
+
+subtest 'unknown-protocol GC payload converts via WIG' => sub {
+    use JSON::PP;
+
+    my $codes = $converter->import_format('GCIR', $eufy_gc_json);
+    is(scalar(@$codes), 2, 'imports every command (Eufy 40 Bit is not registered)');
+    my $auto = (grep { $_->alias eq 'Auto' } @$codes)[0];
+    ok($auto, 'Auto decoded') or return;
+    is($auto->alias,    'Auto',     'alias from the command name');
+    is($auto->protocol, 'UNKNOWN',  'unknown protocol imports as UNKNOWN');
+    is($auto->bypass_protocol, 1,   'raw code sets bypass_protocol');
+    is($codes->[1]->alias, 'CurrentTime', 'second command imported as UNKNOWN too');
+
+    my $raw = JSON::PP->new->decode($eufy_gc_json);
+    my $orig = $raw->{commands}[0]{pronto};
+    is($auto->pronto, $orig, 'original Pronto hex stashed verbatim');
+    is($converter->export_code($auto, 'Pronto'), $orig,
+        'Pronto export re-emits the stashed hex');
+
+    my $wig = $converter->export_code($auto, 'WIG');
+    my $doc = JSON::PP->new->decode($wig);
+    is($doc->{signals}[0]{bypass_protocol}, JSON::PP::true,
+        'wig keeps bypass_protocol');
+    is($doc->{signals}[0]{pronto},   $orig,     'wig keeps pronto hex verbatim');
+
+    my $wig_codes = $converter->import_format('WIG', $wig);
+    is(scalar(@$wig_codes), 1, 'wig round-trips to one code');
+    is($wig_codes->[0]->pronto, $orig, 'wig -> code keeps pronto hex');
+
+    # Mode2/Tasmota uses the retained timings instead.
+    like($converter->export_code($auto, 'Mode2'), qr/^pulse 29\d{2}/m,
+        'mode2 export uses decoded timings');
+};
 
 done_testing;

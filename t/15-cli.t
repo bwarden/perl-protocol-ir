@@ -357,6 +357,40 @@ MODE2
     like($out, qr/^IRSend /, 'Tasmota IRSend output');
 };
 
+subtest 'ir-convert gcir to wig passes unknown protocols through' => sub {
+    # Two commands extracted from a real "Eufy 40 Bit" GC export; the
+    # workspace sample files are local-only, so the payloads are embedded.
+    my $dir = tempdir(CLEANUP => 1);
+    my $gc = File::Spec->catfile($dir, 'eufy.gc.json');
+    _slurp_write($gc, <<'JSON');
+{"commands": [
+  {"keycode": "G:Eufy 40 Bit:()(0x68A0000008)():3", "name": "Auto",
+   "pronto": "0000 006D 002A 0000 0071 0072 0013 0013 0013 0039 0013 0039 0013 0013 0013 0039 0013 0013 0013 0013 0013 0013 0013 0039 0013 0013 0013 0039 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0039 0013 0013 0013 0013 0013 0013 0013 0304",
+   "protocol": "Eufy 40 Bit"},
+  {"keycode": "G:Eufy 40 Bit:()(0x68450632E5)():3", "name": "CurrentTime",
+   "pronto": "0000 006D 002A 0000 0071 0072 0013 0013 0013 0039 0013 0039 0013 0013 0013 0039 0013 0013 0013 0013 0013 0013 0013 0013 0013 0039 0013 0013 0013 0013 0013 0013 0013 0039 0013 0013 0013 0039 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0013 0039 0013 0039 0013 0013 0013 0013 0013 0013 0013 0039 0013 0039 0013 0013 0013 0013 0013 0039 0013 0013 0013 0039 0013 0039 0013 0039 0013 0013 0013 0013 0013 0039 0013 0013 0013 0039 0013 0304",
+   "protocol": "Eufy 40 Bit"}
+]}
+JSON
+
+    my ($out, $exit) = run_script('ir-convert', '--from', 'gcir', '--to', 'wig',
+        '--in', $gc, '--name', 'Eufy Vacuum');
+    is($exit, 0, 'exits 0');
+    my $wig = json_ok($out, 'WIG output');
+    return unless $wig;
+    is(scalar(@{ $wig->{signals} }), 2, 'both "Eufy 40 Bit" commands converted');
+    is($wig->{signals}[0]{alias}, 'Auto', 'first button is Auto');
+    like($wig->{signals}[0]{pronto}, qr/^0000 006D 002A/, 'raw Pronto hex carried through');
+
+    my $wig_file = File::Spec->catfile($dir, 'eufy.wig.json');
+    _slurp_write($wig_file, $out);
+    my ($pr, $pe) = run_script('ir-convert', '--from', 'wig', '--to', 'pronto',
+        '--in', $wig_file);
+    is($pe, 0, 'wig to pronto exits 0');
+    my @lines = grep { /\S/ } split /\n/, $pr;
+    is(scalar(@lines), 2, 'one verbatim Pronto line per signal');
+};
+
 subtest 'ir-convert usage errors' => sub {
     my ($o1, $e1) = run_script('ir-convert', '--from', 'csv', '--to', 'csv');
     isnt($e1, 0, 'rejects non-exportable --to csv');
