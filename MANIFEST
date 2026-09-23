@@ -10,6 +10,7 @@ examples/wig.pl
 lib/Protocol/IR/Code.pm
 lib/Protocol/IR/Converter.pm
 lib/Protocol/IR/Format/CSV.pm
+lib/Protocol/IR/Format/GC.pm
 lib/Protocol/IR/Format/LIRC.pm
 lib/Protocol/IR/Format/Mode2.pm
 lib/Protocol/IR/Format/Pronto.pm

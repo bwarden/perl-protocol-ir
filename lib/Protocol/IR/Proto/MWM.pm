@@ -2,7 +2,7 @@ package Protocol::IR::Proto::MWM;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Math::BigInt;
 use Protocol::IR::Code;

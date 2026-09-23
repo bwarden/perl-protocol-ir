@@ -2,7 +2,7 @@ package Protocol::IR::Code;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 sub new {
     my ($class, %args) = @_;

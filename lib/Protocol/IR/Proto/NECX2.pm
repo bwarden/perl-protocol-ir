@@ -2,7 +2,7 @@ package Protocol::IR::Proto::NECX2;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use parent 'Protocol::IR::Proto::NEC';
 

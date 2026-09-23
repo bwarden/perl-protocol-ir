@@ -1,5 +1,8 @@
 Revision history for Protocol::IR::Code
 
+0.07    2026-09-22
+    - Global Cache imports pass signals no registered protocol recognizes through as raw UNKNOWN Pronto (lossless verbatim re-export); GC commands without a Pronto payload are skipped; ir-convert learns --from gcir/globalcache
+
 0.06    2026-09-20
     - Protocol::IR::Proto::MWM gains an optional unbundle capability: a
       whole A+B+A' capture that Tasmota / IRremoteESP8266 (commit 247bcdb3
