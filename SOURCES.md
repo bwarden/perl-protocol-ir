@@ -44,11 +44,11 @@ seems wrong or a number looks arbitrary, check these first.
 
 - **HAIR** — https://github.com/DAB-LABS/HAIR
   Home Assistant IR integration. Defines the `hair-wig` format family
-  (WIG, "wireless infrared group") that `Protocol::IR::Format::WIG` emits.
+  (the "wig" format) that `Protocol::IR::Format::Wig` emits.
 
 - **IrScrutinizer / harctoolboxbundle** — https://github.com/bengtmartensson/harctoolboxbundle
   (project: https://github.com/bengtmartensson/IrScrutinizer)
-  The ecosystem around IRDB, MakeHex IRP files, and the LIRC/WIG/HAIR/Pronto
+  The ecosystem around IRDB, MakeHex IRP files, and the LIRC/wig/HAIR/Pronto
   formats. Useful for cross-checking interpretations of the formats handled
   here.
 

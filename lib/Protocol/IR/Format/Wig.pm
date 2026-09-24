@@ -1,4 +1,4 @@
-package Protocol::IR::Format::WIG;
+package Protocol::IR::Format::Wig;
 use strict;
 use warnings;
 
@@ -12,7 +12,7 @@ use Protocol::IR::Format::GC;
 
 use constant FORMAT_VERSION => 'hair-wig/3';
 
-# WIG ("wireless infrared group") is the portable IR code set format
+# wig is the portable IR code set format
 # used by the HAIR Home Assistant integration
 # (https://github.com/DAB-LABS/HAIR): one JSON file, one remote, raw
 # Pronto hex as the payload.
@@ -26,21 +26,21 @@ use constant FORMAT_VERSION => 'hair-wig/3';
 
 sub decode {
     my ($class, $input, $registry) = @_;
-    die "No WIG input provided\n" unless defined $input;
+    die "No wig input provided\n" unless defined $input;
 
     my $text = _read_input($input);
     $text =~ s/^\x{FEFF}//; # Strip UTF-8 BOM if present
 
     my $data = eval { JSON::PP->new->utf8->decode($text) };
-    die "Invalid WIG JSON: $@\n" if $@;
-    die "WIG top level must be a JSON object\n" unless ref $data eq 'HASH';
+    die "Invalid wig JSON: $@\n" if $@;
+    die "wig top level must be a JSON object\n" unless ref $data eq 'HASH';
     # A Global Cache IR database export (a "commands" list with raw Pronto
     # hex payloads, no hair-wig "format" field) carries the same signals a
     # wig does, so the wig entry point imports it interchangeably.
     if (!defined $data->{format} && ref $data->{commands} eq 'ARRAY') {
         return Protocol::IR::Format::GC->decode($input, $registry);
     }
-    die "Unsupported WIG format: " . ($data->{format} // '(missing)') . "\n"
+    die "Unsupported wig format: " . ($data->{format} // '(missing)') . "\n"
         unless defined $data->{format} && $data->{format} =~ m{^hair-wig/([1-3])$};
 
     my @decoded_codes;
@@ -49,7 +49,7 @@ sub decode {
         next unless defined $sig->{pronto} && $sig->{pronto} ne '';
 
         my $code = eval { $registry->import_format('Pronto', $sig->{pronto}) };
-        die "WIG signal '" . ($sig->{alias} // '') . "' cannot be decoded: $@\n"
+        die "wig signal '" . ($sig->{alias} // '') . "' cannot be decoded: $@\n"
             if $@ || !defined $code;
 
         $code->alias($sig->{alias} // '');
@@ -65,7 +65,7 @@ sub decode {
     return \@decoded_codes;
 }
 
-# Generate a WIG from one Protocol::IR::Code or an arrayref of them.
+# Generate a wig from one Protocol::IR::Code or an arrayref of them.
 #
 # Options:
 #   name    - remote name (required by the format; default 'Untitled')
@@ -120,7 +120,7 @@ sub _read_input {
     return $input if $input =~ /[\r\n]/;
 
     if (-e $input) {
-        open my $fh, '<', $input or die "Cannot open WIG file '$input': $!\n";
+        open my $fh, '<', $input or die "Cannot open wig file '$input': $!\n";
         local $/;
         my $text = <$fh>;
         close $fh;
@@ -148,7 +148,7 @@ sub _new_uuid {
 
 =head1 NAME
 
-Protocol::IR::Format::WIG - HAIR WIG (wireless infrared group) JSON import and export
+Protocol::IR::Format::Wig - HAIR wig JSON import and export
 
 =head1 VERSION
 
@@ -162,7 +162,7 @@ version 0.08
     my @codes = @{ $converter->import_format('CSV', 'remote.csv') };
 
     # Export Protocol::IR::Code objects to a HAIR hair-wig/3 JSON document
-    my $wig = $converter->export_codes('WIG', \@codes,
+    my $wig = $converter->export_codes('wig', \@codes,
         name  => 'Tigersecu DVR',
         brand => 'Tigersecu',
         model => 'TS-1080',
@@ -170,20 +170,20 @@ version 0.08
         notes => 'Converted from the IRDB sample set',
     );
 
-    # Import a WIG (file path or JSON string) back into Protocol::IR::Code objects
-    my $imported = $converter->import_format('WIG', 'remote.wig.json');
+    # Import a wig (file path or JSON string) back into Protocol::IR::Code objects
+    my $imported = $converter->import_format('wig', 'remote.wig.json');
     for my $code (@$imported) {
         print $code->alias . " (" . $code->protocol . ")\n";
     }
 
 =head1 DESCRIPTION
 
-WIG ("wireless infrared group") is the portable IR code set format used by
+wig is the portable IR code set format used by
 the HAIR Home Assistant integration
 (L<https://github.com/DAB-LABS/HAIR>): one JSON file, one remote, raw
 Pronto hex as the payload.
 
-C<Protocol::IR::Format::WIG> emits C<hair-wig/3>, the current recipe major: every
+C<Protocol::IR::Format::Wig> emits C<hair-wig/3>, the current recipe major: every
 signal carries an explicit C<ditto_count> and C<bypass_protocol>, plus an optional
 C<send_count> (how many times the whole signal transmits per press) when a code
 carries a repeat count other than the default. On import,
@@ -221,7 +221,7 @@ C<'converted by Protocol::IR::Converter'>
 
     my $codes = $class->decode($input, $registry);
 
-Parses a WIG file path or JSON string and returns an arrayref of L<Protocol::IR::Code>
+Parses a wig file path or JSON string and returns an arrayref of L<Protocol::IR::Code>
 objects. C<alias>, C<ditto_count>, C<bypass_protocol>, and C<send_count> when
 present are preserved on each code. Dies if the JSON is invalid, the format
 is unsupported, or a signal's Pronto payload cannot be decoded.

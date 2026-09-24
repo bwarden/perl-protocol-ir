@@ -9,7 +9,7 @@ use_ok('Protocol::IR::Format::CSV');
 use_ok('Protocol::IR::Format::Mode2');
 use_ok('Protocol::IR::Format::Pronto');
 use_ok('Protocol::IR::Format::Tasmota');
-use_ok('Protocol::IR::Format::WIG');
+use_ok('Protocol::IR::Format::Wig');
 use_ok('Protocol::IR::Proto::JVC');
 use_ok('Protocol::IR::Proto::JVC48');
 use_ok('Protocol::IR::Proto::MWM');

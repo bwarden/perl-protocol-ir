@@ -54,7 +54,7 @@ A NECx1 frame shares its 4500/4500 us header with L<Protocol::IR::Proto::SAMSUNG
 from timing alone. L<Protocol::IR::Converter> registers C<SAMSUNG> before C<NECX1>,
 matching real-world Samsung captures; the C<NECX1> name is produced when a
 code is imported by name (CSV, C<decode_params>, C<decode_raw>), the
-IRDB-to-WIG path. The data word is identical under either label.
+IRDB-to-wig path. The data word is identical under either label.
 
 =head1 METHODS
 

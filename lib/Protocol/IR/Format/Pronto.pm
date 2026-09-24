@@ -69,7 +69,7 @@ sub decode {
     # No registered protocol matched. A payload with real timing data is
     # still valid raw Pronto Hex, so keep it as an opaque UNKNOWN code rather
     # than failing: container conversions that just move Pronto hex (e.g.
-    # Global Cache to WIG) must not depend on naming the protocol. The
+    # Global Cache to wig) must not depend on naming the protocol. The
     # original hex is stashed verbatim (lossless re-export) and the mark/space
     # timings are kept for the other timing formats. A truncated or empty
     # payload is malformed, not merely unknown, and still dies.
@@ -130,7 +130,7 @@ only recognized if it matches a registered protocol. A well-formed string
 with real timing data that no protocol recognizes is not an error: it
 decodes to an opaque C<UNKNOWN> code (C<bypass_protocol> set, original hex
 stashed in C<pronto>) so container conversions that move Pronto hex (Global
-Cache to WIG, and so on) can still complete. Truncated or empty payloads are
+Cache to wig, and so on) can still complete. Truncated or empty payloads are
 still rejected. C<export> re-emits the stashed hex verbatim.
 
 =head1 METHODS

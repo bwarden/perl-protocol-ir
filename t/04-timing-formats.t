@@ -11,7 +11,7 @@ my $converter = Protocol::IR::Converter->new();
 
 # --- fully decoded codes across timing formats ---------------------------
 # A fully decoded code must survive conversion to and from Pronto, Tasmota
-# RawData, and WIG with identical protocol/data/address/command, and the
+# RawData, and wig with identical protocol/data/address/command, and the
 # timings generated for each format must be identical.
 my @codes = (
     $converter->import_code('NEC',      { address => 4, subaddress => 0, command => 8 }),
@@ -25,13 +25,13 @@ for my $code (@codes) {
 
     my $pronto = $converter->export_code($code, 'Pronto');
     my $tas    = $converter->export_code($code, 'Tasmota', style => 'comma');
-    my $wig    = $converter->export_codes('WIG', $code);
+    my $wig    = $converter->export_codes('wig', $code);
 
     my $from_pronto = $converter->import_format('Pronto', $pronto);
     my $from_tas    = $converter->import_format('Tasmota', $tas)->[0];
-    my $from_wig    = $converter->import_format('WIG', $wig)->[0];
+    my $from_wig    = $converter->import_format('wig', $wig)->[0];
 
-    for my $pair ([$from_pronto, 'Pronto'], [$from_tas, 'Tasmota'], [$from_wig, 'WIG']) {
+    for my $pair ([$from_pronto, 'Pronto'], [$from_tas, 'Tasmota'], [$from_wig, 'wig']) {
         my ($decoded, $fmt) = @$pair;
         is($decoded->protocol, $proto,              "$proto survives $fmt roundtrip");
         is($decoded->data,     $code->data,         "$proto data survives $fmt roundtrip");
@@ -47,7 +47,7 @@ for my $code (@codes) {
 
 # --- captured data across timing formats ---------------------------------
 # A real capture that decodes must keep its decoded code through Pronto and
-# WIG as well as Tasmota.
+# wig as well as Tasmota.
 my $fixture = File::Spec->rel2abs(File::Spec->catfile(
     dirname(__FILE__), 'data', 'tasmota-captures.log'));
 open my $fh, '<', $fixture or die "Cannot open $fixture: $!\n";
@@ -67,15 +67,15 @@ while (my $line = <$fh>) {
     is($via_pronto->protocol, $orig->protocol, "fixture line $line_no code survives Pronto");
     is($via_pronto->data,     $orig->data,     "fixture line $line_no data survives Pronto");
 
-    my $via_wig = $converter->import_format('WIG',
-        $converter->export_codes('WIG', $orig))->[0];
-    is($via_wig->protocol, $orig->protocol, "fixture line $line_no code survives WIG");
-    is($via_wig->data,     $orig->data,     "fixture line $line_no data survives WIG");
+    my $via_wig = $converter->import_format('wig',
+        $converter->export_codes('wig', $orig))->[0];
+    is($via_wig->protocol, $orig->protocol, "fixture line $line_no code survives wig");
+    is($via_wig->data,     $orig->data,     "fixture line $line_no data survives wig");
 }
 close $fh;
 cmp_ok($checked, '>=', 11, 'cross-checked the bundled capture frames');
 
-# --- HAIR-style WIG input ------------------------------------------------
+# --- HAIR-style wig input ------------------------------------------------
 # HAIR WIGs carry Pronto hex; timings are assumed to have been quantized
 # and cleaned up for recognized protocols, so a properly quantized signal
 # should decode correctly, and mild jitter within one carrier pulse must
@@ -93,10 +93,10 @@ sub wig_json {
     });
 }
 
-my $clean = $converter->import_format('WIG', wig_json($pronto))->[0];
-is($clean->protocol, 'NEC', 'HAIR-style WIG decodes protocol');
-is($clean->data,     0x10EF00FF, 'HAIR-style WIG decodes data');
-is($clean->alias,    'POWER', 'HAIR-style WIG carries alias');
+my $clean = $converter->import_format('wig', wig_json($pronto))->[0];
+is($clean->protocol, 'NEC', 'HAIR-style wig decodes protocol');
+is($clean->data,     0x10EF00FF, 'HAIR-style wig decodes data');
+is($clean->alias,    'POWER', 'HAIR-style wig carries alias');
 
 # Perturb a few timing marks by a few microseconds; as long as each value
 # still rounds to the same carrier pulse the signal must decode identically.
@@ -106,8 +106,8 @@ for my $idx (6, 10, 14, 18, 22, 26) {
     my $us = hex($t[$idx]) * $period;
     $t[$idx] = sprintf('%04X', int(($us + 6) / $period + 0.5));
 }
-my $jittered = $converter->import_format('WIG', wig_json(join ' ', @t))->[0];
-is($jittered->protocol, 'NEC', 'jittered HAIR-style WIG still decodes');
-is($jittered->data,     0x10EF00FF, 'jittered HAIR-style WIG preserves data');
+my $jittered = $converter->import_format('wig', wig_json(join ' ', @t))->[0];
+is($jittered->protocol, 'NEC', 'jittered HAIR-style wig still decodes');
+is($jittered->data,     0x10EF00FF, 'jittered HAIR-style wig preserves data');
 
 done_testing;

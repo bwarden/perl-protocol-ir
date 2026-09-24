@@ -19,7 +19,7 @@ use Protocol::IR::Proto::NECX2;
 use Protocol::IR::Proto::MWM;
 use Protocol::IR::Format::Pronto;
 use Protocol::IR::Format::CSV;
-use Protocol::IR::Format::WIG;
+use Protocol::IR::Format::Wig;
 use Protocol::IR::Format::GC;
 use Protocol::IR::Format::Tasmota;
 use Protocol::IR::Format::Mode2;
@@ -33,7 +33,7 @@ sub new {
         formats        => {},
     }, $class;
 
-    # Protocols, registered in the order Pronto/Tasmota/WIG decoding tries
+    # Protocols, registered in the order Pronto/Tasmota/wig decoding tries
     # them. Handlers whose timing signatures overlap must be ordered so the
     # most likely interpretation wins, because the timing decoders cannot
     # tell them apart:
@@ -92,7 +92,7 @@ sub new {
     # Formats
     $self->register_format('Pronto', 'Protocol::IR::Format::Pronto');
     $self->register_format('CSV',    'Protocol::IR::Format::CSV');
-    $self->register_format('WIG',    'Protocol::IR::Format::WIG');
+    $self->register_format('wig',    'Protocol::IR::Format::Wig');
     $self->register_format('GCIR',       'Protocol::IR::Format::GC');
     $self->register_format('GlobalCache','Protocol::IR::Format::GC');
     $self->register_format('Tasmota','Protocol::IR::Format::Tasmota');
@@ -211,7 +211,7 @@ sub export_code {
     return $format_class->export($ir_code, $self, %opts);
 }
 
-# Export a set of Protocol::IR::Code objects to a container format (e.g. WIG).
+# Export a set of Protocol::IR::Code objects to a container format (e.g. wig).
 sub export_codes {
     my ($self, $format_name, $codes, %opts) = @_;
     my $format_class = $self->{formats}{uc $format_name};
@@ -263,8 +263,8 @@ version 0.08
     my $codes = $converter->import_format('CSV',
         "functionname,protocol,device,subdevice,function\nKEY_POWER,NEC1,4,0,8");
 
-    # Export a set of Protocol::IR::Code objects to a HAIR WIG file
-    my $wig = $converter->export_codes('WIG', $codes,
+    # Export a set of Protocol::IR::Code objects to a HAIR wig file
+    my $wig = $converter->export_codes('wig', $codes,
         name  => 'Tigersecu DVR',
         brand => 'Tigersecu',
         kind  => 'dvr',
@@ -294,7 +294,7 @@ C<SAMSUNG> (32-bit), C<SAMSUNG20> (20-bit), C<SAMSUNG36> (36-bit),
 C<NECX1>/C<NECX2> (extended NEC, half header), C<MWM> (Disney "Made With
 Magic", 24-144 bit serial)
 
-=item * Formats: C<Pronto>, C<Tasmota>, C<WIG>, C<CSV>, C<Mode2>,
+=item * Formats: C<Pronto>, C<Tasmota>, C<wig>, C<CSV>, C<Mode2>,
 C<LIRC>
 
 =back
@@ -303,12 +303,12 @@ C<Pronto>, C<Tasmota>, C<Mode2>, and C<LIRC> are timing-based formats;
 L<Protocol::IR::Format::Pronto>, L<Protocol::IR::Format::Tasmota>,
 L<Protocol::IR::Format::Mode2>, and L<Protocol::IR::Format::LIRC> document
 their exact behavior.
-L<Protocol::IR::Format::WIG> implements the HAIR "wireless infrared group"
+L<Protocol::IR::Format::Wig> implements the HAIR "wig"
 JSON format. L<Protocol::IR::Format::CSV> imports IRDB-style button listings.
 
 =head1 Decoding versus generating timings
 
-For the timing-based formats (Tasmota C<RawData>, Pronto Hex, and WIG), the
+For the timing-based formats (Tasmota C<RawData>, Pronto Hex, and wig), the
 goal of this library is to I<generate> correct timings from fully decoded
 C<Protocol::IR::Code> objects. That direction is authoritative: given a correctly
 decoded code, the emitted timings are exact.
@@ -320,13 +320,13 @@ jitter, and corruption that a real decoding library (such as
 C<IRremoteESP8266>) accounts for. A capture may therefore fail to be
 recognized, or in rare ambiguous cases be misidentified. Conversions
 between fully decoded representations (raw hex, parameter hashes, IRDB CSV,
-WIG) are exact and reliable.
+wig) are exact and reliable.
 
 Conversions between the timing formats themselves (Tasmota C<RawData>,
-Pronto Hex, and WIG) are exact and correct: a fully decoded code survives
+Pronto Hex, and wig) are exact and correct: a fully decoded code survives
 each format unchanged, and the timings generated for a given code are
-identical across all three (WIG carries Pronto hex, so Tasmota, Pronto, and
-WIG always agree). For recognized protocols, WIG files produced by HAIR are
+identical across all three (wig carries Pronto hex, so Tasmota, Pronto, and
+wig always agree). For recognized protocols, wig files produced by HAIR are
 assumed to carry timings that have already been quantized and cleaned up, so
 they should decode correctly -- but, as with any raw timing input, this is
 not guaranteed.
@@ -350,11 +350,11 @@ Two command-line tools are installed with the distribution:
 =over 4
 
 =item * C<ir-irdb2wig> -- convert an IRDB CSV file (local, fetched from a
-URL, or downloaded from the IRDB repository by device path) to a HAIR WIG
+URL, or downloaded from the IRDB repository by device path) to a HAIR wig
 JSON file.
 
 =item * C<ir-convert> -- general converter between the supported formats
-(CSV, WIG, Pronto, Tasmota, LIRC).
+(CSV, wig, Pronto, Tasmota, LIRC).
 
 =back
 
@@ -369,7 +369,7 @@ work from any directory once the distribution is installed.
 
 Creates a converter, registering the bundled protocols (NEC, NEC2, 48-NEC1,
 48-NEC2, JVC, JVC-48, SAMSUNG, SAMSUNG20, SAMSUNG36, NECX1, NECX2, MWM) and
-formats (Pronto, CSV, WIG, Tasmota, Mode2, LIRC).
+formats (Pronto, CSV, wig, Tasmota, Mode2, LIRC).
 
 =head2 import_code
 
@@ -391,14 +391,14 @@ extra options through to the format's C<export> method.
 
 =head2 export_codes
 
-    my $wig = $converter->export_codes('WIG', \@codes, name => 'Remote');
+    my $wig = $converter->export_codes('wig', \@codes, name => 'Remote');
 
 Serializes one or more L<Protocol::IR::Code> objects into a container format such as
-WIG. A single object is wrapped in an arrayref automatically.
+wig. A single object is wrapped in an arrayref automatically.
 
 =head2 import_format
 
-    my $codes = $converter->import_format('WIG', 'remote.wig.json');
+    my $codes = $converter->import_format('wig', 'remote.wig.json');
     my $code  = $converter->import_format('Pronto', $pronto_str);
 
 Parses external input in the named format (file path, raw string, JSON,

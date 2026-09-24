@@ -206,14 +206,14 @@ is($by_alias{'KEY_AC'}->data,         0x27201,    'SAMSUNG20 row data');
 is($by_alias{'KEY_BLURAY'}->protocol, 'SAMSUNG36', 'SAMSUNG36 row keeps protocol');
 is($by_alias{'KEY_BLURAY'}->data,     0x7004F023E, 'SAMSUNG36 row data');
 
-# --- end-to-end: IRDB CSV to HAIR WIG and back -------------------------------
-my $wig = $converter->export_codes('WIG', $codes, name => 'Wide Protocols');
-my $back = $converter->import_format('WIG', $wig);
-is(scalar(@$back), 5, 'WIG roundtrip decodes all five signals');
+# --- end-to-end: IRDB CSV to HAIR wig and back -------------------------------
+my $wig = $converter->export_codes('wig', $codes, name => 'Wide Protocols');
+my $back = $converter->import_format('wig', $wig);
+is(scalar(@$back), 5, 'wig roundtrip decodes all five signals');
 my %back_by_alias = map { $_->alias => $_ } @$back;
-is($back_by_alias{'KEY_POWER'}->data,  0x4DB2DE2100FF, '48-NEC1 WIG roundtrip data');
-is($back_by_alias{'KEY_PLAY'}->data,   0x030122210300, 'JVC-48 WIG roundtrip data');
-is($back_by_alias{'KEY_AC'}->data,     0x27201,        'SAMSUNG20 WIG roundtrip data');
-is($back_by_alias{'KEY_BLURAY'}->data, 0x7004F023E,    'SAMSUNG36 WIG roundtrip data');
+is($back_by_alias{'KEY_POWER'}->data,  0x4DB2DE2100FF, '48-NEC1 wig roundtrip data');
+is($back_by_alias{'KEY_PLAY'}->data,   0x030122210300, 'JVC-48 wig roundtrip data');
+is($back_by_alias{'KEY_AC'}->data,     0x27201,        'SAMSUNG20 wig roundtrip data');
+is($back_by_alias{'KEY_BLURAY'}->data, 0x7004F023E,    'SAMSUNG36 wig roundtrip data');
 
 done_testing;

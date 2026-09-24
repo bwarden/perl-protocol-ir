@@ -34,11 +34,11 @@ Options:
     --to FORMAT     Output format (required): wig, pronto, tasmota, mode2, lirc
     --in FILE       Read input from FILE instead of stdin
     --out FILE      Write output to FILE instead of stdout
-    --name NAME     WIG remote name (default: Untitled)
-    --brand BRAND   WIG manufacturer/brand
-    --model MODEL   WIG model
-    --kind KIND     WIG device kind slug, e.g. tv, soundbar, ac
-    --notes TEXT    WIG free-form notes
+    --name NAME     wig remote name (default: Untitled)
+    --brand BRAND   wig manufacturer/brand
+    --model MODEL   wig model
+    --kind KIND     wig device kind slug, e.g. tv, soundbar, ac
+    --notes TEXT    wig free-form notes
     --overwrite     Allow --out to overwrite an existing file
     -h, --help      Show this help
 
@@ -93,7 +93,7 @@ if ($to eq 'wig') {
     for my $k (qw(brand model kind notes)) {
         $meta{$k} = $opt{$k} if defined $opt{$k};
     }
-    $output = $converter->export_codes('WIG', $codes, %meta);
+    $output = $converter->export_codes('wig', $codes, %meta);
 } elsif ($to eq 'pronto') {
     $output = join("\n", map { $converter->export_code($_, 'Pronto') } @$codes) . "\n";
 } elsif ($to eq 'tasmota') {

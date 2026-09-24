@@ -15,7 +15,7 @@ lib/Protocol/IR/Format/LIRC.pm
 lib/Protocol/IR/Format/Mode2.pm
 lib/Protocol/IR/Format/Pronto.pm
 lib/Protocol/IR/Format/Tasmota.pm
-lib/Protocol/IR/Format/WIG.pm
+lib/Protocol/IR/Format/Wig.pm
 lib/Protocol/IR/Proto/JVC.pm
 lib/Protocol/IR/Proto/JVC48.pm
 lib/Protocol/IR/Proto/MWM.pm

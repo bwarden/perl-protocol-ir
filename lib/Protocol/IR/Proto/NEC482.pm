@@ -41,7 +41,7 @@ identical single frame; only the repeat structure differs (it re-transmits
 the whole frame rather than a short header+gap ditto frame). Because the
 repeat is invisible to the single-frame decoders, a timing decode labels both
 variants C<48-NEC1>; the C<48-NEC2> name is produced when a code is imported
-by name (CSV, C<decode_params>, C<decode_raw>), which is the IRDB-to-WIG
+by name (CSV, C<decode_params>, C<decode_raw>), which is the IRDB-to-wig
 path.
 
 =head1 METHODS

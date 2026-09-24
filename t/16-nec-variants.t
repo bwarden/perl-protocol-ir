@@ -182,22 +182,22 @@ is($by_alias{'KEY_POWER3'}->protocol, 'NECX2', 'NECx2 kept as NECX2');
 is($by_alias{'KEY_POWER3'}->data,     0x070702FD, 'NECX2 Samsung POWER row data');
 is($by_alias{'KEY_MUTE'}->protocol,   'NEC',   'lowercase nec1 normalized to NEC');
 
-# --- end-to-end: IRDB CSV to HAIR WIG and back ------------------------------
-my $wig = $converter->export_codes('WIG', $codes,
+# --- end-to-end: IRDB CSV to HAIR wig and back ------------------------------
+my $wig = $converter->export_codes('wig', $codes,
     name => 'Mixed NEC', brand => 'Test', kind => 'tv');
-my $back = $converter->import_format('WIG', $wig);
-is(scalar(@$back), 5, 'WIG roundtrip decodes all five signals');
+my $back = $converter->import_format('wig', $wig);
+is(scalar(@$back), 5, 'wig roundtrip decodes all five signals');
 my %back_by_alias = map { $_->alias => $_ } @$back;
-is($back_by_alias{'KEY_POWER'}->data,  0x040008F7, 'NEC1 WIG roundtrip data');
-is($back_by_alias{'KEY_POWER2'}->data, 0x1AE805FA, 'NEC2 WIG roundtrip data');
-is($back_by_alias{'KEY_INPUT'}->data,  0xA2A201FE, 'NECX1 WIG roundtrip data');
-is($back_by_alias{'KEY_POWER3'}->data, 0x070702FD, 'NECX2 WIG roundtrip data');
+is($back_by_alias{'KEY_POWER'}->data,  0x040008F7, 'NEC1 wig roundtrip data');
+is($back_by_alias{'KEY_POWER2'}->data, 0x1AE805FA, 'NEC2 wig roundtrip data');
+is($back_by_alias{'KEY_INPUT'}->data,  0xA2A201FE, 'NECX1 wig roundtrip data');
+is($back_by_alias{'KEY_POWER3'}->data, 0x070702FD, 'NECX2 wig roundtrip data');
 
 # Single-frame NEC2 timing is identical to NEC1, and NECx1/NECx2 timing is
 # identical to SAMSUNG (all 4500/4500 half-header frames), so on a *timing*
 # decode the registry labels NEC2 frames as NEC and NECx frames as SAMSUNG.
 # The data word is preserved either way; the protocol identity is only kept
-# when importing by name (CSV/decode_params), which is the IRDB->WIG path.
+# when importing by name (CSV/decode_params), which is the IRDB->wig path.
 is($back_by_alias{'KEY_POWER'}->protocol,  'NEC',    'NEC2 frame labeled NEC by timing');
 is($back_by_alias{'KEY_POWER3'}->protocol, 'SAMSUNG', 'NECx frame labeled SAMSUNG by timing');
 

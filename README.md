@@ -65,15 +65,15 @@ handlers; you normally do not construct `Protocol::IR::Code` objects directly.
 
 - alias
 
-    A human-readable button name, carried by CSV and WIG round trips.
+    A human-readable button name, carried by CSV and wig round trips.
 
 - ditto\_count
 
-    Number of repeat ("ditto") frames a WIG should send after the first.
+    Number of repeat ("ditto") frames a wig should send after the first.
 
 - bypass\_protocol
 
-    Flag marking that a WIG should bypass protocol-aware repeat behavior.
+    Flag marking that a wig should bypass protocol-aware repeat behavior.
 
 - timings
 

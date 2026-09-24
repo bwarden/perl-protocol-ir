@@ -26,7 +26,7 @@ use Protocol::IR::Format::Pronto;
 # how many times the whole code replays on transmission -- is recorded as the
 # trailing ":N" segment of the keycode (the ":3" above) and, in some exports,
 # as an explicit per-command "repeats" field; it lands on the code's
-# send_count so a wig export carries it as send_count.  The WIG importer
+# send_count so a wig export carries it as send_count.  The wig importer
 # auto-detects this shape, so the two formats interchange freely at the
 # converter entry point.  Import-only: the opaque "keycode"/"protocol"
 # strings are Global Cache's own naming, so this format is never exported.
@@ -122,7 +122,7 @@ version 0.08
     }
 
     # The wig entry point accepts the same export interchangeably
-    my $also = $converter->import_format('WIG', 'gc-ir.json');
+    my $also = $converter->import_format('wig', 'gc-ir.json');
 
 =head1 DESCRIPTION
 
@@ -130,7 +130,7 @@ C<Protocol::IR::Format::GC> imports a Global Cache IR database JSON document
 (a C<commands> list, each entry carrying a C<name> and a raw C<pronto> Pronto
 hex payload, plus opaque C<keycode>/C<protocol> strings).  The payload is the
 same Pronto hex a HAIR wig carries, so the imported codes are identical to
-what C<import_format('WIG', ...)> would produce, and the WIG importer accepts
+what C<import_format('wig', ...)> would produce, and the wig importer accepts
 this shape automatically.  Commands that carry no Pronto payload (a compact
 export may list buttons it never captured a signal for) are skipped rather
 than failing the import.  Dies with a concrete reason if the JSON is

@@ -27,7 +27,7 @@ my @codes = (
     ),
 );
 
-my $wig_text = $converter->export_codes('WIG', \@codes,
+my $wig_text = $converter->export_codes('wig', \@codes,
     name => 'Test Remote', brand => 'Acme', model => 'X-1');
 
 my $data = JSON::PP->new->decode($wig_text);
@@ -47,7 +47,7 @@ is($by_alias{MUTE}{ditto_count}, 1, 'ditto_count exported');
 is($by_alias{MUTE}{bypass_protocol}, JSON::PP::true, 'bypass_protocol exported');
 
 # Roundtrip: import what we just exported.
-my $back = $converter->import_format('WIG', $wig_text);
+my $back = $converter->import_format('wig', $wig_text);
 is(scalar(@$back), 3, 'roundtrip decoded three signals');
 is($back->[0]->alias, 'POWER', 'roundtrip alias');
 is($back->[0]->protocol, 'NEC', 'roundtrip protocol');
@@ -61,31 +61,31 @@ is($back->[2]->protocol, 'SAMSUNG', 'roundtrip SAMSUNG protocol');
 is($back->[2]->data, 0x070702FD, 'roundtrip SAMSUNG data');
 
 # Export of a single code (not an arrayref) also works.
-my $single = $converter->export_codes('WIG', $codes[0], name => 'Single');
+my $single = $converter->export_codes('wig', $codes[0], name => 'Single');
 is(scalar(@{JSON::PP->new->decode($single)->{signals}}), 1, 'single-code export');
 
 # Import from a file path.
 my ($fh, $path) = tempfile();
 print {$fh} $wig_text;
 close $fh;
-my $from_file = $converter->import_format('WIG', $path);
+my $from_file = $converter->import_format('wig', $path);
 is(scalar(@$from_file), 3, 'import from file path');
 
 # Import a wig with no signals.
-my $empty_wig = $converter->export_codes('WIG', [], name => 'Empty');
-is(scalar(@{ $converter->import_format('WIG', $empty_wig) }), 0, 'empty signal list');
+my $empty_wig = $converter->export_codes('wig', [], name => 'Empty');
+is(scalar(@{ $converter->import_format('wig', $empty_wig) }), 0, 'empty signal list');
 
 # Error handling.
-eval { $converter->import_format('WIG', undef); };
+eval { $converter->import_format('wig', undef); };
 like($@, qr/no wig input/i, 'rejects missing input');
 
-eval { $converter->import_format('WIG', '{ not json'); };
+eval { $converter->import_format('wig', '{ not json'); };
 like($@, qr/invalid wig json/i, 'rejects invalid JSON');
 
-eval { $converter->import_format('WIG', '[1,2,3]'); };
+eval { $converter->import_format('wig', '[1,2,3]'); };
 like($@, qr/top level must be a json object/i, 'rejects non-object');
 
-eval { $converter->import_format('WIG', '{"format":"hair-wig/99","name":"X","signals":[]}'); };
+eval { $converter->import_format('wig', '{"format":"hair-wig/99","name":"X","signals":[]}'); };
 like($@, qr/unsupported wig format/i, 'rejects unknown format major');
 
 done_testing;

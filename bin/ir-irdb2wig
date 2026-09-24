@@ -11,12 +11,12 @@ use HTTP::Tiny;
 use Protocol::IR::Converter;
 
 my $USAGE = <<'USAGE';
-ir-irdb2wig - convert an IRDB CSV file to a HAIR WIG JSON file
+ir-irdb2wig - convert an IRDB CSV file to a HAIR wig JSON file
 
 IRDB (https://github.com/probonopd/irdb) stores remote control codes as
 CSV files named <manufacturer>/<devicetype>/<device>,<subdevice>.csv.
 This tool converts such a file to HAIR's portable hair-wig/3 JSON format
-(https://github.com/DAB-LABS/HAIR): one WIG file, one remote, raw Pronto
+(https://github.com/DAB-LABS/HAIR): one wig file, one remote, raw Pronto
 hex as the signal payload.
 
 Usage:
@@ -34,12 +34,12 @@ path (as per the IRDB naming convention) and the file is downloaded.
 Options:
     --base URL      Base URL of the IRDB codes tree (default:
                     https://cdn.jsdelivr.net/gh/probonopd/irdb@master/codes)
-    --name NAME     Remote name for the WIG (default: "<brand> <model>")
+    --name NAME     Remote name for the wig (default: "<brand> <model>")
     --brand BRAND   Manufacturer/brand (default: from a repository path)
     --model MODEL   Model (default: the "device,subdevice" file stem)
     --kind KIND     HAIR device kind slug, e.g. tv, soundbar, ac
     --notes TEXT    Free-form notes
-    --out FILE      Write the WIG to FILE instead of stdout
+    --out FILE      Write the wig to FILE instead of stdout
     --overwrite     Allow --out to overwrite an existing file
     --quiet         Suppress progress and skip warnings on stderr
     -h, --help      Show this help
@@ -85,7 +85,7 @@ if ($rows > @$codes) {
 }
 
 my $meta = derive_meta(\%opt, $src_meta);
-my $wig  = $converter->export_codes('WIG', $codes, %$meta);
+my $wig  = $converter->export_codes('wig', $codes, %$meta);
 write_output($wig, $opt{out}, $opt{overwrite});
 exit 0;
 

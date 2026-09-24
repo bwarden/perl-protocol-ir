@@ -52,7 +52,7 @@ Because a single NEC2 frame is indistinguishable from a NEC1 frame, the
 C<decode_timing> decoder of L<Protocol::IR::Proto::NEC> (registered first) matches
 it in L<Protocol::IR::Converter>; the C<NEC2> name is only produced when a code is
 imported by name (CSV, C<decode_params>, C<decode_raw>), which is the
-IRDB-to-WIG path this distribution is built around.
+IRDB-to-wig path this distribution is built around.
 
 =head1 METHODS
 

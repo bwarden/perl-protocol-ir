@@ -6,9 +6,9 @@ Revision history for Protocol::IR::Code
       many times the whole code replays on transmission -- onto a new
       Protocol::IR::Code send_count attribute, read from an explicit
       "repeats" field when present and otherwise from the trailing ":N" of
-      the keycode (e.g. "G:Eufy 40 Bit:()(0x68A0000008)():3"). WIG export
+      the keycode (e.g. "G:Eufy 40 Bit:()(0x68A0000008)():3"). wig export
       carries it as the signal's optional send_count (written only when it
-      differs from the default single press), and WIG import round-trips it,
+      differs from the default single press), and wig import round-trips it,
       so a GC export converts to a wig that replays the same number of times.
       Mirrors the TypeScript port (web-ir-remote-tools src/lib/format/gc.ts,
       wig.ts).

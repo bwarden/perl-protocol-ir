@@ -11,11 +11,11 @@ use Protocol::IR::Converter;
 use Protocol::IR::Format::Tasmota;
 
 my $USAGE = <<'USAGE';
-ir-tasmota2wig - convert a Tasmota IR capture dump to a HAIR WIG JSON file
+ir-tasmota2wig - convert a Tasmota IR capture dump to a HAIR wig JSON file
 
 Reads a Tasmota console log (or a file of IRrecv lines) and converts every
 captured signal into HAIR's portable hair-wig/3 JSON format
-(https://github.com/DAB-LABS/HAIR): one WIG file, one remote, raw Pronto
+(https://github.com/DAB-LABS/HAIR): one wig file, one remote, raw Pronto
 hex as the signal payload.
 
 Both Tasmota capture styles are recognized, on any mix of lines:
@@ -27,21 +27,21 @@ Both Tasmota capture styles are recognized, on any mix of lines:
 "IRsend <freq>,<rawdata>" command lines are accepted too. Timestamps and
 other log noise are ignored.
 
-Captured signals have no button names, so each WIG signal's alias (the key
+Captured signals have no button names, so each wig signal's alias (the key
 HAIR shows) is set to the signal's Data hex value -- e.g. 0x10EF00FF -- and
-is easy to rename after importing the WIG in HAIR.
+is easy to rename after importing the wig in HAIR.
 
 Usage:
     ir-tasmota2wig [options] <dump-file>
     cat dump.log | ir-tasmota2wig [options]
 
 Options:
-    --name NAME     Remote name for the WIG (default: Untitled)
+    --name NAME     Remote name for the wig (default: Untitled)
     --brand BRAND   Manufacturer/brand
     --model MODEL   Model
     --kind KIND     HAIR device kind slug, e.g. tv, soundbar, ac
     --notes TEXT    Free-form notes
-    --out FILE      Write the WIG to FILE instead of stdout
+    --out FILE      Write the wig to FILE instead of stdout
     --overwrite     Allow --out to overwrite an existing file
     --quiet         Suppress the "skipped signals" warning
     -h, --help      Show this help
@@ -87,7 +87,7 @@ my %meta = (name => $opt{name} // 'Untitled', origin => 'converted:tasmota');
 for my $k (qw(brand model kind notes)) {
     $meta{$k} = $opt{$k} if defined $opt{$k};
 }
-my $wig = $converter->export_codes('WIG', $codes, %meta);
+my $wig = $converter->export_codes('wig', $codes, %meta);
 write_output($wig, $opt{out}, $opt{overwrite});
 exit 0;
 

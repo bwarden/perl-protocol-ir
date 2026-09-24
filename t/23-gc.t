@@ -45,18 +45,18 @@ is($vol->data,        0x830002FD,   'second display-form data');
 my $global_cache = $converter->import_format('GlobalCache', $gc_json);
 is($global_cache->[0]->alias, 'PowerToggle', 'GlobalCache is an alias for GCIR');
 
-my $via_wig = $converter->import_format('WIG', $gc_json);
+my $via_wig = $converter->import_format('wig', $gc_json);
 is(scalar(@$via_wig), 2, 'wig entry point imports a GC export interchangeably');
-is($via_wig->[0]->alias, 'PowerToggle', 'WIG import uses the GC command name');
-is($via_wig->[0]->data,  0x830000FF,   'WIG import decodes the same payload');
-is($via_wig->[1]->command, 2,          'WIG import second command');
+is($via_wig->[0]->alias, 'PowerToggle', 'wig import uses the GC command name');
+is($via_wig->[0]->data,  0x830000FF,   'wig import decodes the same payload');
+is($via_wig->[1]->command, 2,          'wig import second command');
 
 # The keycode suffix ":N" is the GC repeat count; some exports also carry an
 # explicit "repeats" field, which wins when present. Both must land on the
 # code's send_count and ride a wig round trip.
 is($power->send_count, 3,            'repeat count parsed from the keycode suffix');
 is($vol->send_count,   3,            'second command keycode suffix parsed too');
-is($via_wig->[0]->send_count, 3,     'WIG gateway keeps the repeat count');
+is($via_wig->[0]->send_count, 3,     'wig gateway keeps the repeat count');
 
 my $field_repeat_json = '{"commands": [{"keycode": "G:Memorex 32 Bit:()(0xC100E01F)():4", "name": "FieldWins", "repeats": 2, "pronto": "0000 006D 0002 0000 0071 0072 0013 0013"}]}';
 my $field_repeat = $converter->import_format('GCIR', $field_repeat_json);
@@ -66,13 +66,13 @@ my $no_repeat_json = '{"commands": [{"keycode": "G:Memorex 32 Bit:()(0xC100E01F)
 my $no_repeat = $converter->import_format('GCIR', $no_repeat_json);
 is($no_repeat->[0]->send_count, 0, 'no repeat recorded stays the single-press default');
 
-my $power_wig = $converter->export_code($power, 'WIG');
+my $power_wig = $converter->export_code($power, 'wig');
 my $power_doc = JSON::PP->new->decode($power_wig);
 is($power_doc->{signals}[0]{send_count}, 3, 'wig carries the repeat count as send_count');
-my $wig_back = $converter->import_format('WIG', $power_wig);
+my $wig_back = $converter->import_format('wig', $power_wig);
 is($wig_back->[0]->send_count, 3, 'wig -> code preserves send_count');
 
-my $no_repeat_wig = JSON::PP->new->decode($converter->export_code($no_repeat->[0], 'WIG'));
+my $no_repeat_wig = JSON::PP->new->decode($converter->export_code($no_repeat->[0], 'wig'));
 ok(!exists $no_repeat_wig->{signals}[0]{send_count}, 'default single press is not written to the wig');
 
 # Pronto export is pulse-quantized, so re-importing the export must
@@ -90,8 +90,8 @@ close $fh;
 my $from_file = $converter->import_format('GCIR', $path);
 is(scalar(@$from_file), 2, 'import from file path');
 
-my $wig_guard = $converter->import_format('WIG', $path);
-is($wig_guard->[0]->alias, 'PowerToggle', 'WIG gateway also reads from a path');
+my $wig_guard = $converter->import_format('wig', $path);
+is($wig_guard->[0]->alias, 'PowerToggle', 'wig gateway also reads from a path');
 
 # Error handling.
 eval { $converter->import_format('GCIR', undef); };
@@ -151,7 +151,7 @@ my $eufy_gc_json = <<'JSON';
 }
 JSON
 
-subtest 'unknown-protocol GC payload converts via WIG' => sub {
+subtest 'unknown-protocol GC payload converts via wig' => sub {
     use JSON::PP;
 
     my $codes = $converter->import_format('GCIR', $eufy_gc_json);
@@ -169,13 +169,13 @@ subtest 'unknown-protocol GC payload converts via WIG' => sub {
     is($converter->export_code($auto, 'Pronto'), $orig,
         'Pronto export re-emits the stashed hex');
 
-    my $wig = $converter->export_code($auto, 'WIG');
+    my $wig = $converter->export_code($auto, 'wig');
     my $doc = JSON::PP->new->decode($wig);
     is($doc->{signals}[0]{bypass_protocol}, JSON::PP::true,
         'wig keeps bypass_protocol');
     is($doc->{signals}[0]{pronto},   $orig,     'wig keeps pronto hex verbatim');
 
-    my $wig_codes = $converter->import_format('WIG', $wig);
+    my $wig_codes = $converter->import_format('wig', $wig);
     is(scalar(@$wig_codes), 1, 'wig round-trips to one code');
     is($wig_codes->[0]->pronto, $orig, 'wig -> code keeps pronto hex');
 

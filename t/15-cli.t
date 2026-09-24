@@ -45,12 +45,12 @@ my $jvc_csv = File::Spec->catfile($data, 'irdb-jvc-vcr.csv');
 
 # --- ir-irdb2wig --------------------------------------------------------
 
-subtest 'ir-irdb2wig converts a local IRDB CSV to a WIG' => sub {
+subtest 'ir-irdb2wig converts a local IRDB CSV to a wig' => sub {
     my ($out, $exit) = run_script('ir-irdb2wig', $nec_csv,
         '--name', 'NEC Receiver', '--brand', 'Acme', '--model', 'M1',
         '--kind', 'vcr');
     is($exit, 0, 'exits 0');
-    my $wig = json_ok($out, 'WIG output');
+    my $wig = json_ok($out, 'wig output');
     return unless $wig;
     is($wig->{format}, 'hair-wig/3', 'hair-wig/3 format');
     is($wig->{name}, 'NEC Receiver', 'name set');
@@ -92,7 +92,7 @@ subtest 'ir-irdb2wig usage errors' => sub {
     like($h, qr/IRDB/, '--help mentions IRDB');
 };
 
-subtest 'ir-tasmota2wig converts a Tasmota dump to a WIG' => sub {
+subtest 'ir-tasmota2wig converts a Tasmota dump to a wig' => sub {
     my $dir  = tempdir(CLEANUP => 1);
     my $dump = File::Spec->catfile($dir, 'dump.log');
     _slurp_write($dump, <<'DUMP');
@@ -103,7 +103,7 @@ DUMP
     my ($out, $exit) = run_script('ir-tasmota2wig', $dump, '--name', 'Captured',
         '--kind', 'tv');
     is($exit, 0, 'exits 0');
-    my $wig = json_ok($out, 'WIG output');
+    my $wig = json_ok($out, 'wig output');
     return unless $wig;
     is($wig->{format}, 'hair-wig/3', 'hair-wig/3 format');
     is($wig->{name}, 'Captured', 'name set');
@@ -118,7 +118,7 @@ DUMP
 subtest 'ir-tasmota2wig usage errors' => sub {
     my ($out, $exit) = run_script('ir-tasmota2wig', '--help');
     is($exit, 0, '--help exits 0');
-    like($out, qr/HAIR WIG/, '--help describes the tool');
+    like($out, qr/HAIR wig/, '--help describes the tool');
 };
 
 # --- ir-convert ---------------------------------------------------------
@@ -127,7 +127,7 @@ subtest 'ir-convert csv to wig' => sub {
     my ($out, $exit) = run_script('ir-convert', '--from', 'csv', '--to', 'wig',
         '--in', $nec_csv, '--name', 'From CLI', '--brand', 'Acme', '--kind', 'tv');
     is($exit, 0, 'exits 0');
-    my $wig = json_ok($out, 'WIG output');
+    my $wig = json_ok($out, 'wig output');
     return unless $wig;
     is($wig->{format}, 'hair-wig/3', 'hair-wig/3 format');
     is($wig->{name}, 'From CLI', 'name set');
@@ -140,7 +140,7 @@ subtest 'ir-convert wig to pronto' => sub {
     my $wig_file = File::Spec->catfile($dir, 'in.wig.json');
     my ($wig, $we) = run_script('ir-convert', '--from', 'csv', '--to', 'wig',
         '--in', $jvc_csv, '--name', 'JVC VCR');
-    is($we, 0, 'source WIG built') or return;
+    is($we, 0, 'source wig built') or return;
     _slurp_write($wig_file, $wig);
 
     my ($out, $exit) = run_script('ir-convert', '--from', 'wig', '--to', 'pronto',
@@ -200,7 +200,7 @@ subtest 'ir-convert csv to wig with headers' => sub {
     my ($out, $exit) = run_script('ir-convert', '--from', 'csv', '--to', 'wig',
         '--in', $file, '--name', 'CLI Test');
     is($exit, 0, 'exits 0');
-    my $wig = json_ok($out, 'WIG output');
+    my $wig = json_ok($out, 'wig output');
     return unless $wig;
     is(scalar(@{ $wig->{signals} }), 2, 'two CSV rows produce two signals');
     ok($wig->{signals}[0]{pronto} =~ /^0000 /, 'signals carry Pronto hex');
@@ -211,18 +211,18 @@ subtest 'ir-convert wig to pronto roundtrip' => sub {
     my $wig_file = File::Spec->catfile($dir, 'roundtrip.wig.json');
     my $pronto_file = File::Spec->catfile($dir, 'roundtrip.pronto');
 
-    # Build a WIG from a known NEC signal (from CSV)
+    # Build a wig from a known NEC signal (from CSV)
     my $nec_csv = File::Spec->catfile($data, 'irdb-nec-receiver.csv');
     my ($wig_json, $we) = run_script('ir-convert', '--from', 'csv', '--to', 'wig',
         '--in', $nec_csv, '--name', 'RT');
-    is($we, 0, 'WIG built from CSV') or return;
+    is($we, 0, 'wig built from CSV') or return;
     _slurp_write($wig_file, $wig_json);
 
     my ($out, $exit) = run_script('ir-convert', '--from', 'wig', '--to', 'pronto',
         '--in', $wig_file);
     is($exit, 0, 'exits 0');
     my @lines = grep { /\S/ } split /\n/, $out;
-    is(scalar(@lines), 7, 'one Pronto line per WIG signal');
+    is(scalar(@lines), 7, 'one Pronto line per wig signal');
     ok($lines[0] =~ /^0000 /, 'lines are raw Pronto hex');
 };
 
@@ -376,7 +376,7 @@ JSON
     my ($out, $exit) = run_script('ir-convert', '--from', 'gcir', '--to', 'wig',
         '--in', $gc, '--name', 'Eufy Vacuum');
     is($exit, 0, 'exits 0');
-    my $wig = json_ok($out, 'WIG output');
+    my $wig = json_ok($out, 'wig output');
     return unless $wig;
     is(scalar(@{ $wig->{signals} }), 2, 'both "Eufy 40 Bit" commands converted');
     is($wig->{signals}[0]{alias}, 'Auto', 'first button is Auto');

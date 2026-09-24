@@ -205,7 +205,7 @@ sub _import_structured {
 # The button-name substitute used when a capture has no known key name: the
 # code's "Data" hex value, formatted like Tasmota's Data field (0x030C for a
 # 16-bit JVC frame, 0x10EF00FF for a 32-bit NEC frame, the full word for the
-# wide protocols). A WIG built from these gets editable button names the
+# wide protocols). A wig built from these gets editable button names the
 # user can correct after importing it in HAIR.
 sub _data_alias {
     my ($code) = @_;
@@ -222,7 +222,7 @@ sub _data_alias {
 # Timestamps and other log noise are ignored. Signals that fail to decode
 # to a registered protocol -- an unsupported protocol name, or raw data
 # that matches no protocol -- are dropped. Every decoded signal gets a
-# data-hex alias (see _data_alias) so a WIG built from the result has
+# data-hex alias (see _data_alias) so a wig built from the result has
 # editable button names.
 sub decode_dump {
     my ($class, $input, $registry) = @_;
@@ -384,7 +384,7 @@ even when no protocol matches (the code's protocol is then C<UNKNOWN>).
 
 A protocol-structured line and a raw-data signal that decodes to a known
 protocol get their C<alias> set to the signal's Data hex value (e.g.
-C<0x10EF00FF>, width-matched to the protocol's bit count), so a WIG built
+C<0x10EF00FF>, width-matched to the protocol's bit count), so a wig built
 from them carries editable button names.
 
 =head2 Decoding a full console dump

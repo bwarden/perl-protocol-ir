@@ -152,22 +152,22 @@ in Tasmota (see the individual protocol modules).
 
 =item alias
 
-A human-readable button name, carried by CSV and WIG round trips.
+A human-readable button name, carried by CSV and wig round trips.
 
 =item ditto_count
 
-Number of repeat ("ditto") frames a WIG should send after the first.
+Number of repeat ("ditto") frames a wig should send after the first.
 
 =item send_count
 
-How many times the whole signal transmits per press (the WIG's C<send_count>,
+How many times the whole signal transmits per press (the wig's C<send_count>,
 the Global Cache IR database's per-command repeat count).  Zero means the
-source carried no repeat count, so a WIG export omits C<send_count> and the
+source carried no repeat count, so a wig export omits C<send_count> and the
 default single press is assumed.
 
 =item bypass_protocol
 
-Flag marking that a WIG should bypass protocol-aware repeat behavior.
+Flag marking that a wig should bypass protocol-aware repeat behavior.
 
 =item timings
 
