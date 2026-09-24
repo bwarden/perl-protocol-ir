@@ -2,7 +2,7 @@ package Protocol::IR::Proto::SAMSUNG;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 use Protocol::IR::Code;
 
 # Timing and bit ordering follow IRremoteESP8266 (Copyright David Conran et al.,
@@ -221,7 +221,7 @@ Protocol::IR::Proto::SAMSUNG - SAMSUNG protocol handler (32-bit)
 
 =head1 VERSION
 
-version 0.04
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -351,6 +351,12 @@ is C<NECx2,7,7,2>: device 7 is the bit-reversal of address 0xE0, function
 
 Use L<Protocol::IR::Converter/cross_protocol> to convert between the two
 automatically, or call C<as_necx2_params> directly for IRDB lookups.
+
+=head1 SUPPORT
+
+Source code: L<https://github.com/bwarden/perl-protocol-ir>
+
+Bug reports and feature requests: L<https://github.com/bwarden/perl-protocol-ir/issues>
 
 =head1 AUTHOR
 

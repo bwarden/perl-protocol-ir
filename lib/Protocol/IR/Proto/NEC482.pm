@@ -2,7 +2,7 @@ package Protocol::IR::Proto::NEC482;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use parent 'Protocol::IR::Proto::NEC48';
 
@@ -21,7 +21,7 @@ Protocol::IR::Proto::NEC482 - 48-NEC2 protocol handler (48-bit NEC, whole-frame 
 
 =head1 VERSION
 
-version 0.04
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -48,6 +48,12 @@ path.
 
 All methods are inherited from L<Protocol::IR::Proto::NEC48>; only the
 protocol name differs.
+
+=head1 SUPPORT
+
+Source code: L<https://github.com/bwarden/perl-protocol-ir>
+
+Bug reports and feature requests: L<https://github.com/bwarden/perl-protocol-ir/issues>
 
 =head1 AUTHOR
 

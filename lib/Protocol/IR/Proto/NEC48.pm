@@ -2,7 +2,7 @@ package Protocol::IR::Proto::NEC48;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 use Protocol::IR::Code;
 
 # Protocol::IR::Proto::NEC48 is the base class for the 48-bit NEC family
@@ -209,7 +209,7 @@ Protocol::IR::Proto::NEC48 - 48-NEC1 protocol handler (48-bit NEC family base)
 
 =head1 VERSION
 
-version 0.04
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -290,6 +290,12 @@ L<Protocol::IR::Code> when the header, 48 data bits, and stop bit match the
     my $pronto = $class->to_pronto($ir_code);
 
 Encodes an L<Protocol::IR::Code> object as a Pronto Hex string at 38 kHz.
+
+=head1 SUPPORT
+
+Source code: L<https://github.com/bwarden/perl-protocol-ir>
+
+Bug reports and feature requests: L<https://github.com/bwarden/perl-protocol-ir/issues>
 
 =head1 AUTHOR
 

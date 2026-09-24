@@ -2,7 +2,7 @@ package Protocol::IR::Format::WIG;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use JSON::PP;
 
@@ -141,7 +141,7 @@ Protocol::IR::Format::WIG - HAIR WIG (wireless infrared group) JSON import and e
 
 =head1 VERSION
 
-version 0.04
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -212,6 +212,12 @@ Parses a WIG file path or JSON string and returns an arrayref of L<Protocol::IR:
 objects. C<alias>, C<ditto_count>, and C<bypass_protocol> are preserved on
 each code. Dies if the JSON is invalid, the format is unsupported, or a
 signal's Pronto payload cannot be decoded.
+
+=head1 SUPPORT
+
+Source code: L<https://github.com/bwarden/perl-protocol-ir>
+
+Bug reports and feature requests: L<https://github.com/bwarden/perl-protocol-ir/issues>
 
 =head1 AUTHOR
 

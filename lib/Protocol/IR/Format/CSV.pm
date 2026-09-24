@@ -2,7 +2,7 @@ package Protocol::IR::Format::CSV;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 # Parse a single CSV line with quoted value support
 sub _parse_csv_line {
@@ -132,7 +132,7 @@ Protocol::IR::Format::CSV - IRDB CSV importer
 
 =head1 VERSION
 
-version 0.04
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -192,6 +192,12 @@ C<alias> set from the button name column.
 
 Parses a CSV string or file and returns an arrayref of L<Protocol::IR::Code> objects.
 Rows with an unregistered or unrecognized protocol are skipped.
+
+=head1 SUPPORT
+
+Source code: L<https://github.com/bwarden/perl-protocol-ir>
+
+Bug reports and feature requests: L<https://github.com/bwarden/perl-protocol-ir/issues>
 
 =head1 AUTHOR
 

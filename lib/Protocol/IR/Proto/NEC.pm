@@ -2,7 +2,7 @@ package Protocol::IR::Proto::NEC;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 use Protocol::IR::Code;
 
 # Protocol::IR::Proto::NEC is the base class for the whole NEC protocol family.
@@ -265,7 +265,7 @@ Protocol::IR::Proto::NEC - NEC protocol handler (32-bit) and NEC-family base cla
 
 =head1 VERSION
 
-version 0.04
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -375,6 +375,12 @@ timing signature, otherwise C<undef>.
     my $pronto = $class->to_pronto($ir_code);
 
 Encodes an L<Protocol::IR::Code> object as a Pronto Hex string at 38 kHz.
+
+=head1 SUPPORT
+
+Source code: L<https://github.com/bwarden/perl-protocol-ir>
+
+Bug reports and feature requests: L<https://github.com/bwarden/perl-protocol-ir/issues>
 
 =head1 AUTHOR
 

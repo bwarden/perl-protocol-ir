@@ -2,7 +2,7 @@ package Protocol::IR::Format::Pronto;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub export {
     my ($class, $ir_code, $registry) = @_;
@@ -96,7 +96,7 @@ Protocol::IR::Format::Pronto - Raw Pronto Hex encoder and decoder
 
 =head1 VERSION
 
-version 0.04
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -153,6 +153,12 @@ first matching L<Protocol::IR::Code>, or dies if the string cannot be decoded.
 
 C<decode> is named C<decode> rather than C<import> to avoid clashing with
 Perl's module import hook.
+
+=head1 SUPPORT
+
+Source code: L<https://github.com/bwarden/perl-protocol-ir>
+
+Bug reports and feature requests: L<https://github.com/bwarden/perl-protocol-ir/issues>
 
 =head1 AUTHOR
 

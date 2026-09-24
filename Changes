@@ -1,5 +1,17 @@
 Revision history for Protocol::IR::Code
 
+{{$NEXT}}
+
+    - Moved the release pipeline to Minilla: the distribution is configured
+      by minil.toml and cpanfile, Makefile.PL/META.json/README.md are
+      generated at build time, and module versions are bumped in one step at
+      release time (minil version / minil release). The GitHub Actions
+      release workflow now uploads the Minilla-built tarball to PAUSE on v*
+      tags.
+    - Every module's POD now names the GitHub repository
+      (github.com/bwarden/perl-protocol-ir) for source and bug reporting
+      under a SUPPORT section.
+
 0.07    2026-09-22
     - Global Cache imports pass signals no registered protocol recognizes through as raw UNKNOWN Pronto (lossless verbatim re-export); GC commands without a Pronto payload are skipped; ir-convert learns --from gcir/globalcache
 

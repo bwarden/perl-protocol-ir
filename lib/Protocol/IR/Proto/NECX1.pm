@@ -2,7 +2,7 @@ package Protocol::IR::Proto::NECX1;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use parent 'Protocol::IR::Proto::NEC';
 
@@ -22,7 +22,7 @@ Protocol::IR::Proto::NECX1 - NECx1 protocol handler (extended NEC, half header)
 
 =head1 VERSION
 
-version 0.04
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -60,6 +60,12 @@ IRDB-to-WIG path. The data word is identical under either label.
 
 All methods are inherited from L<Protocol::IR::Proto::NEC>; only the protocol
 name, header, and subaddress behavior differ.
+
+=head1 SUPPORT
+
+Source code: L<https://github.com/bwarden/perl-protocol-ir>
+
+Bug reports and feature requests: L<https://github.com/bwarden/perl-protocol-ir/issues>
 
 =head1 AUTHOR
 

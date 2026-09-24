@@ -2,7 +2,7 @@ package Protocol::IR::Proto::NECX2;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use parent 'Protocol::IR::Proto::NEC';
 
@@ -38,7 +38,7 @@ Protocol::IR::Proto::NECX2 - NECx2 protocol handler (extended NEC, whole-frame r
 
 =head1 VERSION
 
-version 0.04
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -111,6 +111,12 @@ address 0xE0, function 2 bit-reverses to command 0x40.
 
 Use L<Protocol::IR::Converter/cross_protocol> to convert between the two
 automatically, or call C<as_samsung_params> directly.
+
+=head1 SUPPORT
+
+Source code: L<https://github.com/bwarden/perl-protocol-ir>
+
+Bug reports and feature requests: L<https://github.com/bwarden/perl-protocol-ir/issues>
 
 =head1 AUTHOR
 

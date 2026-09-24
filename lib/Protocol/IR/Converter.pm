@@ -2,7 +2,7 @@ package Protocol::IR::Converter;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Protocol::IR::Code;
 use Protocol::IR::Proto::NEC;
@@ -236,7 +236,7 @@ Protocol::IR::Converter - Registry and manager for IR code protocols and formats
 
 =head1 VERSION
 
-version 0.04
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -513,6 +513,12 @@ using C<< $registry->import_code(...) >> to build them.
 Register it in C<Protocol::IR::Converter::new()>:
 
     $self->register_format('JSON', 'Protocol::IR::Format::JSON');
+
+=head1 SUPPORT
+
+Source code: L<https://github.com/bwarden/perl-protocol-ir>
+
+Bug reports and feature requests: L<https://github.com/bwarden/perl-protocol-ir/issues>
 
 =head1 AUTHOR
 

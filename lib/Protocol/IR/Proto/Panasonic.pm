@@ -2,7 +2,7 @@ package Protocol::IR::Proto::Panasonic;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 use Protocol::IR::Code;
 
 =pod
@@ -13,7 +13,7 @@ Protocol::IR::Proto::Panasonic - Panasonic (Kaseikyo) protocol handler
 
 =head1 VERSION
 
-Version 0.04
+Version 0.08
 
 =head1 DESCRIPTION
 

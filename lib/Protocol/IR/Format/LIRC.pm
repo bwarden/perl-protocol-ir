@@ -2,7 +2,7 @@ package Protocol::IR::Format::LIRC;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Protocol::IR::Code;
 
@@ -601,7 +601,7 @@ Protocol::IR::Format::LIRC - LIRC remote definition format (.lircd.conf) import 
 
 =head1 VERSION
 
-version 0.04
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -675,6 +675,12 @@ L<Protocol::IR::Code> objects.
 
 Serializes one or more L<Protocol::IR::Code> objects into a LIRC remote
 definition string.
+
+=head1 SUPPORT
+
+Source code: L<https://github.com/bwarden/perl-protocol-ir>
+
+Bug reports and feature requests: L<https://github.com/bwarden/perl-protocol-ir/issues>
 
 =head1 AUTHOR
 

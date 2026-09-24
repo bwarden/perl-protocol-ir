@@ -2,7 +2,7 @@ package Protocol::IR::Format::GC;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use JSON::PP;
 
@@ -86,7 +86,7 @@ Protocol::IR::Format::GC - Global Cache IR database JSON import
 
 =head1 VERSION
 
-version 0.01
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -127,6 +127,12 @@ naming, so the format is never exported.
 Parses a GC file path or JSON string and returns an arrayref of
 L<Protocol::IR::Code> objects, one per command with a Pronto payload,
 C<alias> set from the command C<name>.
+
+=head1 SUPPORT
+
+Source code: L<https://github.com/bwarden/perl-protocol-ir>
+
+Bug reports and feature requests: L<https://github.com/bwarden/perl-protocol-ir/issues>
 
 =head1 AUTHOR
 

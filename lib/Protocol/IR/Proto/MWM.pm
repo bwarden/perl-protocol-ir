@@ -2,7 +2,7 @@ package Protocol::IR::Proto::MWM;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Math::BigInt;
 use Protocol::IR::Code;
@@ -371,7 +371,7 @@ Protocol::IR::Proto::MWM - MWM protocol handler (Disney "Made With Magic")
 
 =head1 VERSION
 
-version 0.04
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -438,6 +438,12 @@ start/stop bits, implied byte count, 24-144 bits), otherwise C<undef>.
     my $pronto = $class->to_pronto($ir_code);
 
 Encodes an L<Protocol::IR::Code> object as a Pronto Hex string at 38 kHz.
+
+=head1 SUPPORT
+
+Source code: L<https://github.com/bwarden/perl-protocol-ir>
+
+Bug reports and feature requests: L<https://github.com/bwarden/perl-protocol-ir/issues>
 
 =head1 AUTHOR
 

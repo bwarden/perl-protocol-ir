@@ -2,7 +2,7 @@ package Protocol::IR::Proto::NEC2;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use parent 'Protocol::IR::Proto::NEC';
 
@@ -22,7 +22,7 @@ Protocol::IR::Proto::NEC2 - NEC2 protocol handler (repeats the whole frame)
 
 =head1 VERSION
 
-version 0.04
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -58,6 +58,12 @@ IRDB-to-WIG path this distribution is built around.
 
 All methods are inherited from L<Protocol::IR::Proto::NEC>; only the protocol name
 differs.
+
+=head1 SUPPORT
+
+Source code: L<https://github.com/bwarden/perl-protocol-ir>
+
+Bug reports and feature requests: L<https://github.com/bwarden/perl-protocol-ir/issues>
 
 =head1 AUTHOR
 

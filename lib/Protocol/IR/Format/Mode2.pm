@@ -2,7 +2,7 @@ package Protocol::IR::Format::Mode2;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Protocol::IR::Code;
 
@@ -151,7 +151,7 @@ Protocol::IR::Format::Mode2 - LIRC mode2 pulse/space capture import and export
 
 =head1 VERSION
 
-version 0.04
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -207,6 +207,12 @@ timings.
 
 Serializes one L<Protocol::IR::Code>, or an arrayref of them, into mode2
 pulse/space lines.
+
+=head1 SUPPORT
+
+Source code: L<https://github.com/bwarden/perl-protocol-ir>
+
+Bug reports and feature requests: L<https://github.com/bwarden/perl-protocol-ir/issues>
 
 =head1 AUTHOR
 

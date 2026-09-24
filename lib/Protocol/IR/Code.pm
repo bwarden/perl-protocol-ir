@@ -2,7 +2,7 @@ package Protocol::IR::Code;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub new {
     my ($class, %args) = @_;
@@ -87,7 +87,7 @@ Protocol::IR::Code - Intermediate representation of an IR remote control code
 
 =head1 VERSION
 
-version 0.04
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -199,6 +199,12 @@ bytes are the bit-reversal of the NECX2 device/function bytes.
 This is an exported package function (not a method), callable as
 C<< Protocol::IR::Code::reverse_byte($val) >>.
 
+=head1 SUPPORT
+
+Source code: L<https://github.com/bwarden/perl-protocol-ir>
+
+Bug reports and feature requests: L<https://github.com/bwarden/perl-protocol-ir/issues>
+
 =head1 AUTHOR
 
 Brett T. Warden <bwarden@cpan.org>
@@ -210,3 +216,12 @@ Copyright (c) 2026 Brett T. Warden
 This library is free software; you can redistribute it and/or modify it
 under the terms of the GNU Lesser General Public License version 2.1 as
 published by the Free Software Foundation.
+
+=head1 TRADEMARK NOTICE
+
+This project exists solely to enable interoperability with independently
+purchased hardware. It is an independent community project: it is not
+supplied by, authorized by, affiliated with, or endorsed by The Walt Disney
+Company or any other rights holder. "Made With Magic", "Glow With The Show",
+and all related names and marks are trademarks of their respective owners,
+referenced here only to identify interoperable functionality.
