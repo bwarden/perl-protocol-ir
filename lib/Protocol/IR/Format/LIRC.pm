@@ -2,7 +2,7 @@ package Protocol::IR::Format::LIRC;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '1.0';
 
 use Protocol::IR::Code;
 
@@ -601,7 +601,7 @@ Protocol::IR::Format::LIRC - LIRC remote definition format (.lircd.conf) import 
 
 =head1 VERSION
 
-version 0.08
+version 1.0
 
 =head1 SYNOPSIS
 

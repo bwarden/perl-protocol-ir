@@ -2,7 +2,7 @@ package Protocol::IR::Format::GC;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '1.0';
 
 use JSON::PP;
 
@@ -107,7 +107,7 @@ Protocol::IR::Format::GC - Global Cache IR database JSON import
 
 =head1 VERSION
 
-version 0.08
+version 1.0
 
 =head1 SYNOPSIS
 

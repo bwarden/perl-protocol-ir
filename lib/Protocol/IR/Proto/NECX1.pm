@@ -2,7 +2,7 @@ package Protocol::IR::Proto::NECX1;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '1.0';
 
 use parent 'Protocol::IR::Proto::NEC';
 
@@ -22,7 +22,7 @@ Protocol::IR::Proto::NECX1 - NECx1 protocol handler (extended NEC, half header)
 
 =head1 VERSION
 
-version 0.08
+version 1.0
 
 =head1 SYNOPSIS
 

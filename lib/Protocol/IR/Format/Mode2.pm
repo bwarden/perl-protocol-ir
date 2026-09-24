@@ -2,7 +2,7 @@ package Protocol::IR::Format::Mode2;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '1.0';
 
 use Protocol::IR::Code;
 
@@ -151,7 +151,7 @@ Protocol::IR::Format::Mode2 - LIRC mode2 pulse/space capture import and export
 
 =head1 VERSION
 
-version 0.08
+version 1.0
 
 =head1 SYNOPSIS
 

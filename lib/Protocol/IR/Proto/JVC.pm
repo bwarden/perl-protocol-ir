@@ -2,7 +2,7 @@ package Protocol::IR::Proto::JVC;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '1.0';
 use Protocol::IR::Code;
 
 sub _parse_int {
@@ -166,7 +166,7 @@ Protocol::IR::Proto::JVC - JVC protocol handler (16-bit)
 
 =head1 VERSION
 
-version 0.08
+version 1.0
 
 =head1 SYNOPSIS
 

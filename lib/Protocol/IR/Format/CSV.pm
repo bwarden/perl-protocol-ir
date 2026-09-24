@@ -2,7 +2,7 @@ package Protocol::IR::Format::CSV;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '1.0';
 
 # Parse a single CSV line with quoted value support
 sub _parse_csv_line {
@@ -132,7 +132,7 @@ Protocol::IR::Format::CSV - IRDB CSV importer
 
 =head1 VERSION
 
-version 0.08
+version 1.0
 
 =head1 SYNOPSIS
 

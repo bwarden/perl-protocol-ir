@@ -4,7 +4,7 @@ Protocol::IR::Code - Intermediate representation of an IR remote control code
 
 # VERSION
 
-version 0.08
+version 1.0
 
 # SYNOPSIS
 
@@ -70,6 +70,13 @@ handlers; you normally do not construct `Protocol::IR::Code` objects directly.
 - ditto\_count
 
     Number of repeat ("ditto") frames a wig should send after the first.
+
+- send\_count
+
+    How many times the whole signal transmits per press (the wig's `send_count`,
+    the Global Cache IR database's per-command repeat count).  Zero means the
+    source carried no repeat count, so a wig export omits `send_count` and the
+    default single press is assumed.
 
 - bypass\_protocol
 

@@ -2,7 +2,7 @@ package Protocol::IR::Format::Tasmota;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '1.0';
 
 use Protocol::IR::Code;
 
@@ -322,7 +322,7 @@ Protocol::IR::Format::Tasmota - Tasmota RawData import and IRSend export
 
 =head1 VERSION
 
-version 0.08
+version 1.0
 
 =head1 SYNOPSIS
 

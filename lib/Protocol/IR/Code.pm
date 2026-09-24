@@ -2,7 +2,7 @@ package Protocol::IR::Code;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '1.0';
 
 sub new {
     my ($class, %args) = @_;
@@ -89,7 +89,7 @@ Protocol::IR::Code - Intermediate representation of an IR remote control code
 
 =head1 VERSION
 
-version 0.08
+version 1.0
 
 =head1 SYNOPSIS
 

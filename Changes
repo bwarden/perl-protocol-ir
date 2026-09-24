@@ -2,6 +2,8 @@ Revision history for Protocol::IR::Code
 
 {{$NEXT}}
 
+1.0 2026-09-24T02:22:14Z
+
     - Global Cache imports now preserve the per-command repeat count -- how
       many times the whole code replays on transmission -- onto a new
       Protocol::IR::Code send_count attribute, read from an explicit

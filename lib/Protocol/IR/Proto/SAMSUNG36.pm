@@ -2,7 +2,7 @@ package Protocol::IR::Proto::SAMSUNG36;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '1.0';
 use Protocol::IR::Code;
 
 # Protocol::IR::Proto::SAMSUNG36 is the SAMSUNG36 protocol handler (36-bit),
@@ -209,7 +209,7 @@ Protocol::IR::Proto::SAMSUNG36 - SAMSUNG36 protocol handler (36-bit)
 
 =head1 VERSION
 
-version 0.08
+version 1.0
 
 =head1 SYNOPSIS
 
