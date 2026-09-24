@@ -24,7 +24,10 @@ sub run_script {
     my ($script, @args) = @_;
     my $cmd = File::Spec->catfile($root, 'bin', $script);
     my @quoted = map { "'" . ($_ =~ s/'/'\\''/gr) . "'" } @args;
-    my $out = `$^X $cmd @quoted 2>/dev/null`;
+    # </dev/null: the tools fall back to reading input from STDIN when no
+    # input file is given, which would otherwise block if the parent test's
+    # stdin is an interactive terminal.
+    my $out = `$^X $cmd @quoted 2>/dev/null </dev/null`;
     my $exit = $? >> 8;
     return ($out, $exit);
 }
@@ -208,12 +211,9 @@ subtest 'ir-convert wig to pronto roundtrip' => sub {
     my $wig_file = File::Spec->catfile($dir, 'roundtrip.wig.json');
     my $pronto_file = File::Spec->catfile($dir, 'roundtrip.pronto');
 
-    # Build a WIG from a known NEC signal
-    my ($wig_json, $we) = run_script('ir-convert', '--from', 'tasmota',
-        '--to', 'wig', '--name', 'RT');
-    # Instead, build WIG from CSV
+    # Build a WIG from a known NEC signal (from CSV)
     my $nec_csv = File::Spec->catfile($data, 'irdb-nec-receiver.csv');
-    ($wig_json, $we) = run_script('ir-convert', '--from', 'csv', '--to', 'wig',
+    my ($wig_json, $we) = run_script('ir-convert', '--from', 'csv', '--to', 'wig',
         '--in', $nec_csv, '--name', 'RT');
     is($we, 0, 'WIG built from CSV') or return;
     _slurp_write($wig_file, $wig_json);

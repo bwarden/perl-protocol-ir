@@ -5,9 +5,9 @@ Revision history for Protocol::IR::Code
     - Moved the release pipeline to Minilla: the distribution is configured
       by minil.toml and cpanfile, Makefile.PL/META.json/README.md are
       generated at build time, and module versions are bumped in one step at
-      release time (minil version / minil release). The GitHub Actions
-      release workflow now uploads the Minilla-built tarball to PAUSE on v*
-      tags.
+      release time (minil version / minil release). The tag-triggered GitHub
+      Actions workflow rebuilds the distribution and attaches the tarball to
+      a GitHub Release, mirroring what minil release publishes to CPAN.
     - Every module's POD now names the GitHub repository
       (github.com/bwarden/perl-protocol-ir) for source and bug reporting
       under a SUPPORT section.
