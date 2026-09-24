@@ -34,8 +34,11 @@ jobs:
       - name: Install dependencies
         run: cpanm --installdeps --notest .
 
+      # The license renderer must be installed with Minilla: lgpl_2_1 in
+      # minil.toml is resolved via Software::License::LGPL_2_1, which is not
+      # a prereq of this dist so --installdeps never pulls it.
       - name: Install Minilla
-        run: cpanm --notest Minilla
+        run: cpanm --notest Minilla Software::License::LGPL_2_1
 
       # minil test enables AUTHOR_TESTING by default, so the author checks
       # (POD validity, MANIFEST sync, version consistency) run too.

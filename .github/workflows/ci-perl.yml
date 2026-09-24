@@ -29,8 +29,11 @@ jobs:
       - name: Install dependencies
         run: cpanm --installdeps --notest .
 
+      # Install the license renderer with Minilla: lgpl_2_1 in minil.toml is
+      # resolved via Software::License::LGPL_2_1, which is not a prereq of
+      # this dist so --installdeps never pulls it.
       - name: Install Minilla (dev tool that builds the release tarball)
-        run: cpanm --notest Minilla
+        run: cpanm --notest Minilla Software::License::LGPL_2_1
 
       - name: Build
         run: |
