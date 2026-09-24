@@ -1,22 +1,27 @@
-name: Release to CPAN
+name: Release distribution
 
-# Triggered by a tag like `v0.08`. Builds the distribution, runs the full
-# test suite (including author tests), then uploads the Minilla-built
-# tarball to PAUSE.
+# Triggered by a tag like `v0.08` (pushed by `minil release` on the
+# maintainer's machine). Rebuilds the distribution with Minilla from the
+# tagged source, runs the full test suite (author tests included), checks
+# the tag matches the distribution version, and attaches the built tarball
+# to a GitHub Release.
 #
-# Requires two repository secrets:
-#   PAUSE_USER      your PAUSE ID
-#   PAUSE_PASSWORD  your PAUSE API token (see PAUSE account settings)
+# The PAUSE/CPAN upload is intentionally NOT done here: it needs ~/.pause
+# credentials that only live on the maintainer's machine, so `minil release`
+# handles it (and pushes this tag). That means the tarball attached here and
+# the one uploaded to PAUSE are built from the same minil.toml and the same
+# tracked source, so they carry identical contents — this workflow just makes
+# the same distribution downloadable from GitHub. No secrets required.
 on:
   push:
     tags: ['v*']
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   release:
-    name: "Release ${{ github.ref_name }}"
+    name: "Distribution ${{ github.ref_name }}"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -49,12 +54,7 @@ jobs:
       - name: Build distribution tarball
         run: minil dist --no-test
 
-      - name: Upload to PAUSE
-        env:
-          PAUSE_USER: ${{ secrets.PAUSE_USER }}
-          PAUSE_PASSWORD: ${{ secrets.PAUSE_PASSWORD }}
-        run: |
-          test -n "$PAUSE_USER"     || { echo 'secret PAUSE_USER is not set' >&2; exit 1; }
-          test -n "$PAUSE_PASSWORD" || { echo 'secret PAUSE_PASSWORD is not set' >&2; exit 1; }
-          cpanm --notest CPAN::Uploader
-          cpan-upload --user "$PAUSE_USER" --password "$PAUSE_PASSWORD" Protocol-IR-Code-*.tar.gz
+      - name: Attach tarball to GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Protocol-IR-Code-*.tar.gz
