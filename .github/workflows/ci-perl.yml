@@ -29,13 +29,16 @@ jobs:
       - name: Install dependencies
         run: cpanm --installdeps --notest .
 
+      - name: Install Minilla (dev tool that builds the release tarball)
+        run: cpanm --notest Minilla
+
       - name: Build
         run: |
           perl Makefile.PL
           make
 
-      # Exactly what a user's `cpanm IR::Code` runs. Only install-time tests
-      # must pass here; author tests are skipped (AUTHOR_TESTING unset).
+      # Exactly what a user's `cpanm Protocol::IR::Code` runs. Only install-time
+      # tests must pass here; author tests are skipped (AUTHOR_TESTING unset).
       - name: Install-mode tests
         run: make test
 
@@ -46,8 +49,7 @@ jobs:
           AUTHOR_TESTING: '1'
         run: make test
 
-      # Prove the tarball that would actually be released builds and passes.
-      - name: Verify distribution tarball
-        run: |
-          make disttest
-          make dist
+      # Prove the Minilla-built tarball (the artifact `minil release` uploads)
+      # compiles from the gathered file set.
+      - name: Verify Minilla distribution tarball
+        run: minil dist --no-test

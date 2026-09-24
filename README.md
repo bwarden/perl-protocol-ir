@@ -1,44 +1,140 @@
-# Protocol::IR
+# NAME
 
-Perl protocol library and CLI tools for IR remote codes, split out of the
-former `ir-remote-tools` monorepo.
+Protocol::IR::Code - Intermediate representation of an IR remote control code
 
-`Protocol::IR` is a CPAN distribution rooted at this repository. Main docs
-are the POD in `lib/`; see `SOURCES.md` for how protocol knowledge was
-sourced.
+# VERSION
 
-## Layout
+version 0.08
 
-| Path          | Contents |
-|---------------|----------|
-| `lib/`        | `Protocol::IR::Code` (a decoded IR signal), `Protocol::IR::Converter` (protocol identification + format conversion), format handlers (CSV/LIRC/Mode2/Pronto/Tasmota/WIG/Global Cache JSON) and protocol handlers (NEC family, JVC, Samsung, Panasonic, MWM framing). |
-| `bin/`        | CLI tools: `ir-convert`, `ir-irdb2wig`, `ir-tasmota2wig`. |
-| `t/`          | Test suite (ExtUtils::MakeMaker). |
-| `docs/`       | (unused; the shared MWM protocol docs live in the python-mwm repo) |
+# SYNOPSIS
 
-MWM ("Made With Magic" / Glow With The Show) is covered here only at the
-basic framing level: encoding 2400 bps serial over 38 kHz as raw timings
-(`lib/Protocol/IR/Proto/MWM.pm`). Command-level detail, the color/probe
-tables, and the rig tools (`mwm-probe`, `ir-mwm-send`, `MWMProbe`) live in
-the python-mwm repo, where the equivalent tooling is ported to Python.
+    use Protocol::IR::Converter;
 
-## Build and test
+    my $converter = Protocol::IR::Converter->new();
+    my $code = $converter->import_code('NEC', '0x10EF00FF');
 
-```sh
-perl Makefile.PL
-make
-make test
-```
+    print $code->protocol;    # NEC
+    print $code->address;     # 16
+    print $code->command;     # 0
 
-CI (`ci-perl.yml`) runs a Perl test matrix; `release-perl.yml` publishes
-`IR-Code` to PAUSE on `v*` tags.
+    my $hash = $code->to_irsend;   # Tasmota IRSend JSON payload
 
-## Trademark notice
+# DESCRIPTION
 
-This repository exists solely to enable interoperability with
-independently purchased hardware. It is an independent community project:
-it is not supplied by, authorized by, affiliated with, or endorsed by The
-Walt Disney Company or any other rights holder. "Made With Magic",
-"Glow With The Show", and all related names and marks are trademarks of
-their respective owners, referenced here only to identify interoperable
-functionality.
+`Protocol::IR::Code` is the unified intermediate representation used throughout the
+Protocol::IR::Code distribution. Every protocol handler decodes into an `Protocol::IR::Code`
+object and every format exports from one, so a signal can be moved between
+protocols and formats without loss of information.
+
+The object is compatible with Tasmota's `IRSend` JSON payload structure:
+[to\_irsend](#to_irsend) returns a hash with `Protocol`, `Bits`, and
+`Data` keys. The `data` value is expressed so that it matches Tasmota's
+`Data` field for the protocol.
+
+# ATTRIBUTES
+
+All attributes are read-write accessors, e.g. `$code->alias('POWER')`.
+They are created by the [Protocol::IR::Converter](https://metacpan.org/pod/Protocol%3A%3AIR%3A%3AConverter) registry and the protocol/format
+handlers; you normally do not construct `Protocol::IR::Code` objects directly.
+
+- protocol
+
+    Protocol name (e.g. `NEC`), or `UNKNOWN` for undecoded timing data.
+
+- bits
+
+    Number of data bits in the frame.
+
+- address
+
+    Primary address (device) byte.
+
+- subaddress
+
+    Secondary address byte, or `-1` when the protocol has none (JVC, SAMSUNG)
+    or when it equals the one's complement of the address (standard NEC frames).
+
+- command
+
+    Command (function) byte.
+
+- data
+
+    The raw transmitted value. Bit order matches the protocol's `Data` field
+    in Tasmota (see the individual protocol modules).
+
+- alias
+
+    A human-readable button name, carried by CSV and WIG round trips.
+
+- ditto\_count
+
+    Number of repeat ("ditto") frames a WIG should send after the first.
+
+- bypass\_protocol
+
+    Flag marking that a WIG should bypass protocol-aware repeat behavior.
+
+- timings
+
+    When a signal is decoded from raw timing data (Pronto or Tasmota), the
+    individual mark/space timings are retained here so the capture can be
+    re-exported losslessly. `undef` for codes built from decoded fields.
+
+- pronto
+
+    The original raw Pronto Hex payload of a signal no registered protocol
+    recognized, stashed verbatim so the code re-exports losslessly as a raw
+    (protocol `UNKNOWN`, `bypass_protocol` set) signal. `undef` for codes
+    built from decoded fields.
+
+# METHODS
+
+## to\_irsend
+
+    my $hash = $code->to_irsend;
+
+Returns a hashref with `Protocol`, `Bits`, and (when known) `Data` keys,
+matching the structure of a Tasmota `IRSend` JSON payload.
+
+# FUNCTIONS
+
+## reverse\_byte
+
+    my $reversed = Protocol::IR::Code::reverse_byte(0xE0);  # returns 0x07
+
+Reverses the bits within an 8-bit byte.  Used by
+["as\_necx2\_params" in Protocol::IR::Proto::SAMSUNG](https://metacpan.org/pod/Protocol%3A%3AIR%3A%3AProto%3A%3ASAMSUNG#as_necx2_params) and
+["as\_samsung\_params" in Protocol::IR::Proto::NECX2](https://metacpan.org/pod/Protocol%3A%3AIR%3A%3AProto%3A%3ANECX2#as_samsung_params) for cross-protocol
+conversion between SAMSUNG and NECX2, where the Samsung address/command
+bytes are the bit-reversal of the NECX2 device/function bytes.
+
+This is an exported package function (not a method), callable as
+`Protocol::IR::Code::reverse_byte($val)`.
+
+# SUPPORT
+
+Source code: [https://github.com/bwarden/perl-protocol-ir](https://github.com/bwarden/perl-protocol-ir)
+
+Bug reports and feature requests: [https://github.com/bwarden/perl-protocol-ir/issues](https://github.com/bwarden/perl-protocol-ir/issues)
+
+# AUTHOR
+
+Brett T. Warden <bwarden@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+Copyright (c) 2026 Brett T. Warden
+
+This library is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License version 2.1 as
+published by the Free Software Foundation.
+
+# TRADEMARK NOTICE
+
+This project exists solely to enable interoperability with independently
+purchased hardware. It is an independent community project: it is not
+supplied by, authorized by, affiliated with, or endorsed by The Walt Disney
+Company or any other rights holder. "Made With Magic", "Glow With The Show",
+and all related names and marks are trademarks of their respective owners,
+referenced here only to identify interoperable functionality.

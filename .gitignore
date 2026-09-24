@@ -6,13 +6,12 @@ Makefile.aperl
 pm_to_blib
 MYMETA.json
 MYMETA.yml
-META.json
 META.yml
+/.build/
 cover_db/
 *.bak
 *.tmp
 *.tar.gz
-/IR-Converter-*/
 
 # Python
 __pycache__/

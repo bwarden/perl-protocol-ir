@@ -32,6 +32,7 @@ lib/Protocol/IR/Proto/SAMSUNG36.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+README.md
 SOURCES.md
 t/00-load.t
 t/01-code.t
@@ -56,6 +57,7 @@ t/19-mwm.t
 t/20-mode2.t
 t/21-lirc.t
 t/22-cross-protocol.t
+t/23-gc.t
 t/data/conv-jvc.tsv
 t/data/conv-jvc48.tsv
 t/data/conv-nec.tsv

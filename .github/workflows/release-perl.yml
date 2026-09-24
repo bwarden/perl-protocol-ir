@@ -1,7 +1,7 @@
 name: Release to CPAN
 
-# Triggered by a tag like `v0.03`. Builds the distribution, runs the full
-# test suite (including author tests) and `make disttest`, then uploads the
+# Triggered by a tag like `v0.08`. Builds the distribution, runs the full
+# test suite (including author tests), then uploads the Minilla-built
 # tarball to PAUSE.
 #
 # Requires two repository secrets:
@@ -29,18 +29,17 @@ jobs:
       - name: Install dependencies
         run: cpanm --installdeps --notest .
 
+      - name: Install Minilla
+        run: cpanm --notest Minilla
+
+      # minil test enables AUTHOR_TESTING by default, so the author checks
+      # (POD validity, MANIFEST sync, version consistency) run too.
       - name: Build and test
-        env:
-          AUTHOR_TESTING: '1'
-        run: |
-          perl Makefile.PL
-          make
-          make test
-          make disttest
+        run: minil test
 
       - name: Check tag matches distribution version
         run: |
-          version="$(perl -Ilib -MIR::Code -e 'print $IR::Code::VERSION')"
+          version="$(perl -Ilib -MProtocol::IR::Code -e 'print $Protocol::IR::Code::VERSION')"
           tag="${GITHUB_REF_NAME#v}"
           if [ "$tag" != "$version" ]; then
             echo "error: tag '$GITHUB_REF_NAME' does not match dist version $version" >&2
@@ -48,7 +47,7 @@ jobs:
           fi
 
       - name: Build distribution tarball
-        run: make dist
+        run: minil dist --no-test
 
       - name: Upload to PAUSE
         env:
@@ -58,4 +57,4 @@ jobs:
           test -n "$PAUSE_USER"     || { echo 'secret PAUSE_USER is not set' >&2; exit 1; }
           test -n "$PAUSE_PASSWORD" || { echo 'secret PAUSE_PASSWORD is not set' >&2; exit 1; }
           cpanm --notest CPAN::Uploader
-          cpan-upload --user "$PAUSE_USER" --password "$PAUSE_PASSWORD" IR-Code-*.tar.gz
+          cpan-upload --user "$PAUSE_USER" --password "$PAUSE_PASSWORD" Protocol-IR-Code-*.tar.gz
