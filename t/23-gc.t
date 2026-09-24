@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempfile);
+use JSON::PP;
 use Protocol::IR::Converter;
 
 my $converter = Protocol::IR::Converter->new();
@@ -49,6 +50,30 @@ is(scalar(@$via_wig), 2, 'wig entry point imports a GC export interchangeably');
 is($via_wig->[0]->alias, 'PowerToggle', 'WIG import uses the GC command name');
 is($via_wig->[0]->data,  0x830000FF,   'WIG import decodes the same payload');
 is($via_wig->[1]->command, 2,          'WIG import second command');
+
+# The keycode suffix ":N" is the GC repeat count; some exports also carry an
+# explicit "repeats" field, which wins when present. Both must land on the
+# code's send_count and ride a wig round trip.
+is($power->send_count, 3,            'repeat count parsed from the keycode suffix');
+is($vol->send_count,   3,            'second command keycode suffix parsed too');
+is($via_wig->[0]->send_count, 3,     'WIG gateway keeps the repeat count');
+
+my $field_repeat_json = '{"commands": [{"keycode": "G:Memorex 32 Bit:()(0xC100E01F)():4", "name": "FieldWins", "repeats": 2, "pronto": "0000 006D 0002 0000 0071 0072 0013 0013"}]}';
+my $field_repeat = $converter->import_format('GCIR', $field_repeat_json);
+is($field_repeat->[0]->send_count, 2, 'an explicit repeats field wins over the keycode suffix');
+
+my $no_repeat_json = '{"commands": [{"keycode": "G:Memorex 32 Bit:()(0xC100E01F)()", "name": "NoRepeat", "pronto": "0000 006D 0002 0000 0071 0072 0013 0013"}]}';
+my $no_repeat = $converter->import_format('GCIR', $no_repeat_json);
+is($no_repeat->[0]->send_count, 0, 'no repeat recorded stays the single-press default');
+
+my $power_wig = $converter->export_code($power, 'WIG');
+my $power_doc = JSON::PP->new->decode($power_wig);
+is($power_doc->{signals}[0]{send_count}, 3, 'wig carries the repeat count as send_count');
+my $wig_back = $converter->import_format('WIG', $power_wig);
+is($wig_back->[0]->send_count, 3, 'wig -> code preserves send_count');
+
+my $no_repeat_wig = JSON::PP->new->decode($converter->export_code($no_repeat->[0], 'WIG'));
+ok(!exists $no_repeat_wig->{signals}[0]{send_count}, 'default single press is not written to the wig');
 
 # Pronto export is pulse-quantized, so re-importing the export must
 # preserve the decoded fields (as the wig tests establish for the payload).

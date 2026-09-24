@@ -15,6 +15,7 @@ sub new {
         data            => $args{data}            // undef,
         alias           => $args{alias}           // '',
         ditto_count     => $args{ditto_count}     // 0,
+        send_count      => $args{send_count}      // 0,
         bypass_protocol => $args{bypass_protocol} // 0,
         timings         => $args{timings}         // undef,
         pronto          => $args{pronto}          // undef,
@@ -30,6 +31,7 @@ sub command         { $_[0]->{command}         = $_[1] if @_ > 1; $_[0]->{comman
 sub data            { $_[0]->{data}            = $_[1] if @_ > 1; $_[0]->{data} }
 sub alias           { $_[0]->{alias}           = $_[1] if @_ > 1; $_[0]->{alias} }
 sub ditto_count     { $_[0]->{ditto_count}     = $_[1] if @_ > 1; $_[0]->{ditto_count} }
+sub send_count      { $_[0]->{send_count}      = $_[1] if @_ > 1; $_[0]->{send_count} }
 sub bypass_protocol { $_[0]->{bypass_protocol} = $_[1] if @_ > 1; $_[0]->{bypass_protocol} }
 sub timings         { $_[0]->{timings}         = $_[1] if @_ > 1; $_[0]->{timings} }
 sub pronto          { $_[0]->{pronto}          = $_[1] if @_ > 1; $_[0]->{pronto} }
@@ -155,6 +157,13 @@ A human-readable button name, carried by CSV and WIG round trips.
 =item ditto_count
 
 Number of repeat ("ditto") frames a WIG should send after the first.
+
+=item send_count
+
+How many times the whole signal transmits per press (the WIG's C<send_count>,
+the Global Cache IR database's per-command repeat count).  Zero means the
+source carried no repeat count, so a WIG export omits C<send_count> and the
+default single press is assumed.
 
 =item bypass_protocol
 

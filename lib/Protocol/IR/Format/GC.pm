@@ -22,7 +22,11 @@ use Protocol::IR::Format::Pronto;
 #   }
 #
 # The signal payload is raw Pronto hex, exactly as a HAIR wig carries, so a
-# GC export imports to the same code list a wig would.  The WIG importer
+# GC export imports to the same code list a wig would.  The repeat count --
+# how many times the whole code replays on transmission -- is recorded as the
+# trailing ":N" segment of the keycode (the ":3" above) and, in some exports,
+# as an explicit per-command "repeats" field; it lands on the code's
+# send_count so a wig export carries it as send_count.  The WIG importer
 # auto-detects this shape, so the two formats interchange freely at the
 # converter entry point.  Import-only: the opaque "keycode"/"protocol"
 # strings are Global Cache's own naming, so this format is never exported.
@@ -55,10 +59,27 @@ sub decode {
             if $@ || !defined $code;
 
         $code->alias($cmd->{name});
+        $code->send_count(_repeat_count($cmd));
         push @decoded_codes, $code;
     }
 
     return \@decoded_codes;
+}
+
+# The repeat count of a GC command: how many times the whole code replays
+# upon transmission.  A raw IR database export records it two ways -- a
+# per-command "repeats" integer in some exports, and always as the trailing
+# ":N" segment of the keycode (e.g. "G:Eufy 40 Bit:()(0x68A0000008)():3").
+# 0 means no count was recorded, which the wig exporter reads as the default
+# single press.
+sub _repeat_count {
+    my ($cmd) = @_;
+    my $r = $cmd->{repeats};
+    if (defined $r && $r =~ /^\d+$/ && $r >= 1) {
+        return $r;
+    }
+    my ($tail) = defined $cmd->{keycode} ? $cmd->{keycode} =~ /:(\d{1,3})$/ : ();
+    return $tail && $tail >= 1 ? $tail : 0;
 }
 
 # Treat $input as file content when it looks like multi-line data,
@@ -126,7 +147,9 @@ naming, so the format is never exported.
 
 Parses a GC file path or JSON string and returns an arrayref of
 L<Protocol::IR::Code> objects, one per command with a Pronto payload,
-C<alias> set from the command C<name>.
+C<alias> set from the command C<name> and C<send_count> set from the
+command's repeat count (the C<repeats> field, falling back to the trailing
+C<:N> of the keycode).
 
 =head1 SUPPORT
 

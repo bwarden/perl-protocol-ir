@@ -18,10 +18,11 @@ use constant FORMAT_VERSION => 'hair-wig/3';
 # Pronto hex as the payload.
 #
 # We emit hair-wig/3, the current recipe major: every signal carries
-# an explicit ditto_count and bypass_protocol. On import, signals are
-# decoded fresh through the registered protocols (the file never
-# carries decoded fields) and each signal's transmit recipe is kept on
-# the resulting Protocol::IR::Code.
+# an explicit ditto_count and bypass_protocol, plus an optional
+# send_count when a code carries a repeat count other than the default
+# single press. On import, signals are decoded fresh through the
+# registered protocols (the file never carries decoded fields) and each
+# signal's transmit recipe is kept on the resulting Protocol::IR::Code.
 
 sub decode {
     my ($class, $input, $registry) = @_;
@@ -54,6 +55,10 @@ sub decode {
         $code->alias($sig->{alias} // '');
         $code->ditto_count($sig->{ditto_count} // 0);
         $code->bypass_protocol($sig->{bypass_protocol} ? 1 : 0);
+        # send_count (how many times the whole signal transmits per press) is
+        # optional with a default of 1; preserve it so a wig -> wig or later
+        # export round trip keeps it.
+        $code->send_count($sig->{send_count}) if defined $sig->{send_count};
         push @decoded_codes, $code;
     }
 
@@ -78,12 +83,18 @@ sub export {
     my @signals;
     for my $code (@$codes) {
         my $pronto = $registry->export_code($code, 'Pronto');
-        push @signals, {
+        my %sig = (
             alias           => $code->alias,
             pronto          => $pronto,
             ditto_count     => $code->ditto_count // 0,
             bypass_protocol => $code->bypass_protocol ? JSON::PP::true : JSON::PP::false,
-        };
+        );
+        # send_count is optional with a default of 1, so only a repeat count
+        # that differs from the default is written (the canonical forms leave
+        # it out); a code with no recorded repeat (send_count 0) also omits
+        # it, keeping existing exports byte-stable.
+        $sig{send_count} = $code->send_count if $code->send_count >= 2;
+        push @signals, \%sig;
     }
 
     my %wig = (
@@ -173,7 +184,9 @@ the HAIR Home Assistant integration
 Pronto hex as the payload.
 
 C<Protocol::IR::Format::WIG> emits C<hair-wig/3>, the current recipe major: every
-signal carries an explicit C<ditto_count> and C<bypass_protocol>. On import,
+signal carries an explicit C<ditto_count> and C<bypass_protocol>, plus an optional
+C<send_count> (how many times the whole signal transmits per press) when a code
+carries a repeat count other than the default. On import,
 signals are decoded fresh through the registered protocols (the file never
 carries decoded fields), and each signal's transmit recipe is kept on the
 resulting L<Protocol::IR::Code>. Formats C<hair-wig/1> through C<hair-wig/3> are
@@ -209,9 +222,9 @@ C<'converted by Protocol::IR::Converter'>
     my $codes = $class->decode($input, $registry);
 
 Parses a WIG file path or JSON string and returns an arrayref of L<Protocol::IR::Code>
-objects. C<alias>, C<ditto_count>, and C<bypass_protocol> are preserved on
-each code. Dies if the JSON is invalid, the format is unsupported, or a
-signal's Pronto payload cannot be decoded.
+objects. C<alias>, C<ditto_count>, C<bypass_protocol>, and C<send_count> when
+present are preserved on each code. Dies if the JSON is invalid, the format
+is unsupported, or a signal's Pronto payload cannot be decoded.
 
 =head1 SUPPORT
 
