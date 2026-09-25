@@ -458,7 +458,7 @@ sub _export_protocol_remote {
 
     $out .= "\n      begin codes\n";
     for my $code (@$codes) {
-        my $name = $code->alias // 'UNKNOWN';
+        my $name = ($code->alias // '') =~ /\S/ ? $code->alias : 'UNKNOWN';
         my $val = _lirc_code_value($code, $template, $registry);
         $out .= sprintf("          %-20s %s\n", $name, $val);
     }
@@ -483,7 +483,7 @@ sub _export_raw_remote {
     $out .= "      begin raw_codes\n\n";
 
     for my $code (@$codes) {
-        my $name = $code->alias // 'UNKNOWN';
+        my $name = ($code->alias // '') =~ /\S/ ? $code->alias : 'UNKNOWN';
         my $timings = $code->timings;
 
         if ($timings && @$timings) {
