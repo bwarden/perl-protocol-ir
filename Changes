@@ -2,6 +2,8 @@ Revision history for Protocol::IR::Code
 
 {{$NEXT}}
 
+1.2 2026-09-25T19:59:15Z
+
     - Fix the documented source of a code's send_count. The 1.0 entry (and the
       importer's POD) claimed the per-command repeat count is read from a
       "repeats" field, falling back to the keycode's trailing ":N". No file in

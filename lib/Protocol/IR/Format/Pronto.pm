@@ -2,7 +2,7 @@ package Protocol::IR::Format::Pronto;
 use strict;
 use warnings;
 
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 
 sub export {
     my ($class, $ir_code, $registry) = @_;
@@ -105,7 +105,7 @@ Protocol::IR::Format::Pronto - Raw Pronto Hex encoder and decoder
 
 =head1 VERSION
 
-version 1.1
+version 1.2
 
 =head1 SYNOPSIS
 
