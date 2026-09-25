@@ -2,7 +2,7 @@ package Protocol::IR::Converter;
 use strict;
 use warnings;
 
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 use Protocol::IR::Code;
 use Protocol::IR::Proto::NEC;
@@ -238,7 +238,7 @@ Protocol::IR::Converter - Registry and manager for IR code protocols and formats
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 SYNOPSIS
 
