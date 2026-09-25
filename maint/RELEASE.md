@@ -9,7 +9,7 @@ assembled from the git-tracked file set) is split out of the Makefile-based
 
 | Path          | Contents |
 |---------------|----------|
-| `lib/`        | `Protocol::IR::Code` (a decoded IR signal), `Protocol::IR::Converter` (protocol identification + format conversion), format handlers (CSV/LIRC/Mode2/Pronto/Tasmota/wig/Global Cache JSON) and protocol handlers (NEC family, JVC, Samsung, Panasonic, MWM framing). |
+| `lib/`        | `Protocol::IR::Code` (a decoded IR signal), `Protocol::IR::Converter` (protocol identification + format conversion), format handlers (CSV/LIRC/Mode2/Pronto/Tasmota/wig/JSON) and protocol handlers (NEC family, JVC, Samsung, Panasonic, MWM framing). |
 | `bin/`        | CLI tools: `ir-convert`, `ir-irdb2wig`, `ir-tasmota2wig` (installed as the dist's EXE_FILES). |
 | `t/`          | Install-mode tests. `t/07-author.t` additionally cross-checks MANIFEST vs the tree and module versions when `AUTHOR_TESTING=1`. |
 | `maint/`      | This document. |

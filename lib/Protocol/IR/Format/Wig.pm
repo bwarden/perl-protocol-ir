@@ -8,7 +8,7 @@ use JSON::PP;
 
 use Protocol::IR::Code;
 use Protocol::IR::Format::Pronto;
-use Protocol::IR::Format::GC;
+use Protocol::IR::Format::JSON;
 
 use constant FORMAT_VERSION => 'hair-wig/3';
 
@@ -34,11 +34,11 @@ sub decode {
     my $data = eval { JSON::PP->new->utf8->decode($text) };
     die "Invalid wig JSON: $@\n" if $@;
     die "wig top level must be a JSON object\n" unless ref $data eq 'HASH';
-    # A Global Cache IR database export (a "commands" list with raw Pronto
-    # hex payloads, no hair-wig "format" field) carries the same signals a
-    # wig does, so the wig entry point imports it interchangeably.
-    if (!defined $data->{format} && ref $data->{commands} eq 'ARRAY') {
-        return Protocol::IR::Format::GC->decode($input, $registry);
+    # A JSON IR database document (a "commands" list with raw Pronto hex
+    # payloads, no hair-wig "format" field) carries the same signals a wig
+    # does, so the wig entry point imports it interchangeably.
+    if (!defined $data->{format} && (ref $data->{commands} eq 'ARRAY' || defined $data->{codeset})) {
+        return Protocol::IR::Format::JSON->decode($input, $registry);
     }
     die "Unsupported wig format: " . ($data->{format} // '(missing)') . "\n"
         unless defined $data->{format} && $data->{format} =~ m{^hair-wig/([1-3])$};
