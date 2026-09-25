@@ -86,4 +86,24 @@ my $quoted_back = $converter->import_format('CSV', $with_unknown);
 is(scalar(@$quoted_back), 1, 'quoted alias row re-imports');
 is($quoted_back->[0]->alias, 'Boot, power', 'comma alias preserved');
 
+# An alias with an embedded quote is escaped like the web exporter does, and
+# the parser reads that escaping back to the original name.
+my $quote_code = Protocol::IR::Code->new(
+    protocol => 'NEC', address => 4, subaddress => 0, command => 8, alias => 'Boot "power"',
+);
+my $quoted_export = $converter->export_codes('CSV', $quote_code);
+is($quoted_export, "functionname,protocol,device,subdevice,function\n"
+                  . "\"Boot \"\"power\"\"\",NEC,4,0,8\n", 'embedded quote escaped');
+my $quote_back = $converter->import_format('CSV', $quoted_export);
+is($quote_back->[0]->alias, 'Boot "power"', 'escaped quote round-trips');
+
+# Rows the web's exporter emits (RFC ``""`` escapes, padded unquoted fields)
+# parse identically here.
+my $web_style = $converter->import_format('CSV',
+    "functionname,protocol,device,subdevice,function\n"
+  . "\"A \"\"B\"\"\", NEC,  4 , 1, 12\n");
+is($web_style->[0]->alias, 'A "B"',     'web ``""`` escape parsed');
+is($web_style->[0]->protocol, 'NEC',    'padded unquoted protocol trimmed');
+is($web_style->[0]->address, 4,         'padded unquoted device trimmed');
+
 done_testing;

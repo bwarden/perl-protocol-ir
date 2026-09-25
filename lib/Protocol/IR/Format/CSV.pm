@@ -4,17 +4,57 @@ use warnings;
 
 our $VERSION = '1.0';
 
-# Parse a single CSV line with quoted value support
+# Parse a single CSV line with full RFC-style quoting: a field wrapped in
+# double quotes may hold commas, quotes, and newlines, with a literal quote
+# written as a doubled "" exactly as the reference TypeScript parser accepts
+# (the web-ir-remote-tools port emits such files). Unquoted fields are
+# trimmed of surrounding whitespace, again matching the TS port so the two
+# agree on every file. A hand-rolled parser stays because IRDB files are not
+# strict RFC 4180 - header fields can be tab-joined, rows arrive headerless,
+# and quoted values may carry leading/trailing whitespace the strict library
+# parsers reject - and Text::CSV_XS would add a compiled dependency for a
+# format that mostly does not need it.
 sub _parse_csv_line {
     my ($line) = @_;
+    return () unless defined $line;
     $line =~ s/[\r\n]+$//;
     my @fields;
-    while ($line =~ /\s*(?:"([^"]*)"|([^,]*))\s*(?:,|$)/g) {
-        my $val = defined $1 ? $1 : $2;
-        push @fields, $val;
-        last if pos($line) == length($line);
+    my ($field, $in_quotes, $quoted) = ('', 0, 0);
+    for (my $i = 0; $i < length $line; $i++) {
+        my $c = substr($line, $i, 1);
+        if ($in_quotes) {
+            if ($c eq '"') {
+                if (substr($line, $i + 1, 1) eq '"') {
+                    $field .= '"';
+                    $i++;
+                } else {
+                    $in_quotes = 0;
+                }
+            } else {
+                $field .= $c;
+            }
+        } elsif ($c eq '"' && $field eq '') {
+            $in_quotes = 1;
+            $quoted = 1;
+        } elsif ($c eq ',') {
+            push @fields, _field_value($field, $quoted);
+            $field = '';
+            $quoted = 0;
+        } else {
+            $field .= $c;
+        }
     }
+    push @fields, _field_value($field, $quoted);
     return @fields;
+}
+
+# Quoted fields keep their bytes verbatim; unquoted fields are trimmed to
+# match the TypeScript parser's String.trim().
+sub _field_value {
+    my ($value, $quoted) = @_;
+    return $value if $quoted;
+    $value =~ s/^\s+|\s+$//g;
+    return $value;
 }
 
 # Normalize protocol aliases commonly found in IRDB.
@@ -142,7 +182,10 @@ sub export {
         next if $protocol eq 'UNKNOWN';
 
         my $alias = (defined $code->alias && $code->alias =~ /\S/) ? $code->alias : 'UNKNOWN';
-        $alias = qq{"$alias"} if $alias =~ /,|\n/;
+        if ($alias =~ /[",\n\r]/) {
+            $alias =~ s/"/""/g;
+            $alias = qq{"$alias"};
+        }
 
         push @lines, join(',',
             $alias,
@@ -245,8 +288,9 @@ Rows with an unregistered or unrecognized protocol are skipped.
 Serializes a L<Protocol::IR::Code> or an arrayref of codes as canonical IRDB
 CSV: a C<functionname,protocol,device,subdevice,function> header followed by
 one row per code. A code with no addressable decoded fields (an C<UNKNOWN>
-protocol) is skipped. Button names are quoted when they contain a comma or
-newline. Round-tripping through C<decode> reproduces the decoded fields.
+protocol) is skipped. Button names are quoted - with embedded quotes doubled -
+when they contain a comma, double quote, or newline. Round-tripping through
+C<decode> reproduces the decoded fields.
 
 =head1 SUPPORT
 
