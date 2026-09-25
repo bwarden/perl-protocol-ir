@@ -325,13 +325,14 @@ between fully decoded representations (raw hex, parameter hashes, IRDB CSV,
 wig) are exact and reliable.
 
 Conversions between the timing formats themselves (Tasmota C<RawData>,
-Pronto Hex, and wig) are exact and correct: a fully decoded code survives
-each format unchanged, and the timings generated for a given code are
-identical across all three (wig carries Pronto hex, so Tasmota, Pronto, and
-wig always agree). For recognized protocols, wig files produced by HAIR are
-assumed to carry timings that have already been quantized and cleaned up, so
-they should decode correctly -- but, as with any raw timing input, this is
-not guaranteed.
+Pronto Hex, and wig) are exact and lossless: a signal decoded from any timed
+input keeps its quantized C<timings> and, for Pronto Hex, the original hex
+verbatim (see L<Protocol::IR::Code>), so a re-export reproduces the same
+capture byte-for-byte rather than re-quantizing through a protocol encoder.
+For recognized protocols, wig files produced by HAIR are assumed to carry
+timings that have already been quantized and cleaned up, so they should
+decode correctly -- but, as with any raw timing input, this is not
+guaranteed.
 
 =head1 INSTALLATION
 

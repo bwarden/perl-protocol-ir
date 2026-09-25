@@ -176,7 +176,7 @@ subtest 'ir-convert pronto to tasmota' => sub {
         '--to', 'tasmota', '--in', $pronto_file);
     is($exit, 0, 'exits 0');
     like($out, qr/^IRSend /, 'Tasmota IRSend output');
-    like($out, qr/\+9020-4525/, 'contains expected NEC header timings');
+    like($out, qr/\+9020-4520/, 'contains NEC header timings from the source hex');
 };
 
 subtest 'ir-convert tasmota structured line to pronto' => sub {

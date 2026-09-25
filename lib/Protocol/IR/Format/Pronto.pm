@@ -7,8 +7,10 @@ our $VERSION = '1.0';
 sub export {
     my ($class, $ir_code, $registry) = @_;
 
-    # A raw/undecodable code carries its original Pronto Hex verbatim (see
-    # decode), so re-emitting it needs no protocol encoder.
+    # A code decoded from Pronto Hex carries its original hex verbatim (see
+    # decode), so re-emitting it needs no protocol encoder and round-trips
+    # byte-identically. Only codes built from decoded fields (import_code,
+    # CSV) are encoded here.
     return $ir_code->pronto if defined $ir_code->pronto;
 
     my $proto_name = $ir_code->protocol;
@@ -57,29 +59,36 @@ sub decode {
         ];
     }
 
+    # Keep the capture so any re-export is lossless: the quantized mark/space
+    # waveform (for the timing formats) and the original hex verbatim (for a
+    # Pronto re-export or a Pronto-passthrough container such as wig), exactly
+    # as the other timing formats (Tasmota, mode2, LIRC) already do.
+    my @timings;
+    for my $pair (@burst_pairs_us) {
+        push @timings, int($pair->[0]), -int($pair->[1]);
+    }
+
     # Iterate over registered protocols (in registration order) to decode
     # the timing array
     for my $proto_class ($registry->get_protocols()) {
         if ($proto_class->can('decode_timing')) {
             my $code = $proto_class->decode_timing(\@burst_pairs_us);
-            return $code if defined $code;
+            if (defined $code) {
+                $code->timings(\@timings);
+                $code->pronto($pronto_str);
+                return $code;
+            }
         }
     }
 
     # No registered protocol matched. A payload with real timing data is
     # still valid raw Pronto Hex, so keep it as an opaque UNKNOWN code rather
     # than failing: container conversions that just move Pronto hex (e.g.
-    # Global Cache to wig) must not depend on naming the protocol. The
-    # original hex is stashed verbatim (lossless re-export) and the mark/space
-    # timings are kept for the other timing formats. A truncated or empty
-    # payload is malformed, not merely unknown, and still dies.
+    # Global Cache to wig) must not depend on naming the protocol. A truncated
+    # or empty payload is malformed, not merely unknown, and still dies.
     die "Unable to decode Pronto Hex string into a known protocol\n"
         unless @burst_pairs_us;
 
-    my @timings;
-    for my $pair (@burst_pairs_us) {
-        push @timings, int($pair->[0]), -int($pair->[1]);
-    }
     return Protocol::IR::Code->new(
         protocol        => 'UNKNOWN',
         bypass_protocol => 1,
@@ -145,12 +154,25 @@ carrier, so the decoded microsecond timings round-trip cleanly.
 
 Because decoding works from the microsecond timing signature (see
 L<Protocol::IR::Converter/"DECODING VERSUS GENERATING TIMINGS">), a Pronto string is
-only recognized if it matches a registered protocol. A well-formed string
-with real timing data that no protocol recognizes is not an error: it
-decodes to an opaque C<UNKNOWN> code (C<bypass_protocol> set, original hex
-stashed in C<pronto>) so container conversions that move Pronto hex (Global
-Cache to wig, and so on) can still complete. Truncated or empty payloads are
-still rejected. C<export> re-emits the stashed hex verbatim.
+only recognized if it matches a registered protocol. Whether or not it does,
+the decoded L<Protocol::IR::Code> keeps the exact capture -- the quantized
+C<timings> and the hex stashed verbatim in C<pronto> -- so C<export> (and any
+Pronto-passthrough container such as wig or the Global Cache importer)
+round-trips the string byte-identically. A well-formed string with real
+timing data that no protocol recognizes is not an error: it decodes to an
+opaque C<UNKNOWN> code (C<bypass_protocol> set) so container conversions
+that move Pronto hex can still complete. Truncated or empty payloads are
+still rejected.
+
+=over 4
+
+=item * C<pronto> is set on every Pronto decode, so C<export> re-emits the
+original string rather than re-quantizing through the protocol encoder.
+
+=item * C<timings> is set on every Pronto decode, so the same microsecond
+waveform feeds the other timing formats (Tasmota, mode2, LIRC) losslessly.
+
+=back
 
 =head1 METHODS
 
@@ -158,9 +180,10 @@ still rejected. C<export> re-emits the stashed hex verbatim.
 
     my $pronto = $class->export($ir_code, $registry);
 
-Converts a single L<Protocol::IR::Code> object into a Pronto Hex string by asking the
-registered protocol handler for the code's protocol to encode it
-(L<to_pronto>).
+Converts a single L<Protocol::IR::Code> object into a Pronto Hex string.
+When the code was itself decoded from Pronto Hex, its stashed C<pronto>
+string is re-emitted verbatim. Otherwise the registered protocol handler for
+the code's protocol encodes it from its decoded fields (L<to_pronto>).
 
 =head2 decode
 
