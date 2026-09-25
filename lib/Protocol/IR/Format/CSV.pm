@@ -124,11 +124,42 @@ sub decode {
     return \@decoded_codes;
 }
 
+# Serialize decoded codes as canonical IRDB rows. Only addressable,
+# registered-protocol codes can be represented: a code whose protocol is
+# unknown has nothing to key a row on, so it is skipped (the same set the
+# importer drops). Each row carries the decoded fields the importer turns
+# back into a code, so CSV -> Code -> CSV is lossless for addressable
+# codes; the aliased device/subdevice/function columns cannot express every
+# raw word of every protocol (e.g. Samsung20), which is inherent to IRDB's
+# keyed schema, not to this export.
+sub export {
+    my ($class, $codes, $registry, %opts) = @_;
+    $codes = [$codes] unless ref $codes eq 'ARRAY';
+
+    my @lines = ('functionname,protocol,device,subdevice,function');
+    for my $code (@$codes) {
+        my $protocol = $code->protocol // 'UNKNOWN';
+        next if $protocol eq 'UNKNOWN';
+
+        my $alias = (defined $code->alias && $code->alias =~ /\S/) ? $code->alias : 'UNKNOWN';
+        $alias = qq{"$alias"} if $alias =~ /,|\n/;
+
+        push @lines, join(',',
+            $alias,
+            $protocol,
+            $code->address    // 0,
+            $code->subaddress // -1,
+            $code->command    // 0,
+        );
+    }
+    return join("\n", @lines) . "\n";
+}
+
 1;
 
 =head1 NAME
 
-Protocol::IR::Format::CSV - IRDB CSV importer
+Protocol::IR::Format::CSV - IRDB CSV importer and exporter
 
 =head1 VERSION
 
@@ -155,8 +186,8 @@ version 1.0
 
 =head1 DESCRIPTION
 
-C<Protocol::IR::Format::CSV> imports IRDB-style CSV button listings into L<Protocol::IR::Code>
-objects. It accepts either a CSV string or the path to a CSV file.
+C<Protocol::IR::Format::CSV> imports and exports IRDB-style CSV button listings as
+L<Protocol::IR::Code> objects. It accepts either a CSV string or the path to a CSV file.
 
 =over 4
 
@@ -206,6 +237,16 @@ C<alias> set from the button name column.
 
 Parses a CSV string or file and returns an arrayref of L<Protocol::IR::Code> objects.
 Rows with an unregistered or unrecognized protocol are skipped.
+
+=head2 export
+
+    my $csv = $class->export($codes, $registry);
+
+Serializes a L<Protocol::IR::Code> or an arrayref of codes as canonical IRDB
+CSV: a C<functionname,protocol,device,subdevice,function> header followed by
+one row per code. A code with no addressable decoded fields (an C<UNKNOWN>
+protocol) is skipped. Button names are quoted when they contain a comma or
+newline. Round-tripping through C<decode> reproduces the decoded fields.
 
 =head1 SUPPORT
 
