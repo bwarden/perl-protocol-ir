@@ -139,6 +139,26 @@ malformed, a command is missing its name, or a payload cannot be decoded.
 Import-only: the C<keycode>/C<protocol> strings are Global Cache's own
 naming, so the format is never exported.
 
+The export is the IR database JSON Global Cache's Web Service downloads from
+their Configuration Generator (L<https://www.globalcache.com/>).
+
+=over 4
+
+=item Example commands entry
+
+    {
+      "commands": [
+        {
+          "name": "PowerToggle",
+          "keycode": "G:Memorex 32 Bit:()(0xC10000FF)():3",
+          "protocol": "Memorex 32 Bit",
+          "pronto": "0000 006D 0022 0000 0156 00AB 0017 003D 0017 ..."
+        }
+      ]
+    }
+
+=back
+
 =head1 METHODS
 
 =head2 decode

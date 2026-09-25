@@ -595,6 +595,8 @@ sub _read_input {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Protocol::IR::Format::LIRC - LIRC remote definition format (.lircd.conf) import and export
@@ -623,7 +625,33 @@ version 1.0
 
 C<Protocol::IR::Format::LIRC> imports and exports LIRC remote definition
 files (C<.lircd.conf>).  The LIRC format is the de facto standard for
-sharing IR remote control definitions across the LIRC ecosystem.
+sharing IR remote control definitions across the LIRC ecosystem
+(L<https://www.lirc.org/>).
+
+=over 4
+
+=item Example C<.lircd.conf> (NEC transmission with timing template)
+
+    begin remote
+
+      name  Samsung_TV
+      bits           16
+      flags SPACE_ENC|CONST_LENGTH
+      eps            30
+      aeps           100
+
+      header         4500  4500
+      one            550   1650
+      zero           550   550
+      gap            107000
+
+          begin codes
+              KEY_POWER 0xE0E040BF
+          end codes
+
+    end remote
+
+=back
 
 =head2 Import modes
 

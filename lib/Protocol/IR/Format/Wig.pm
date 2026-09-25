@@ -192,6 +192,28 @@ carries decoded fields), and each signal's transmit recipe is kept on the
 resulting L<Protocol::IR::Code>. Formats C<hair-wig/1> through C<hair-wig/3> are
 accepted on import.
 
+=over 4
+
+=item Example C<hair-wig/3> document (a NEC signal)
+
+    {
+      "format": "hair-wig/3",
+      "name": "Samsung TV",
+      "brand": "Samsung",
+      "origin": "converted from IRDB",
+      "signals": [
+        {
+          "alias": "",
+          "bypass_protocol": false,
+          "ditto_count": 0,
+          "pronto": "0000 006D 0022 0000 0157 00AC 0015 0015 ..."
+        }
+      ],
+      "wig_id": "d50a492e-a604-4c32-8bcb-aa542da06023"
+    }
+
+=back
+
 =head1 METHODS
 
 =head2 export

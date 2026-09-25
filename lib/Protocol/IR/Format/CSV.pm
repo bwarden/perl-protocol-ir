@@ -158,6 +158,20 @@ version 1.0
 C<Protocol::IR::Format::CSV> imports IRDB-style CSV button listings into L<Protocol::IR::Code>
 objects. It accepts either a CSV string or the path to a CSV file.
 
+=over 4
+
+=item Example IRDB CSV (Samsung TV, NECx2 variant)
+
+    functionname,protocol,device,subdevice,function
+    POWER,NECx2,7,7,2
+    1,NECx2,7,7,4
+    2,NECx2,7,7,5
+
+=back
+
+This is the delimited Remotec ZXT-120 style CSV used by the IRDB project
+(L<https://github.com/probonopd/irdb>).
+
 Column headers are detected automatically. Recognized header aliases:
 
 =over 4

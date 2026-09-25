@@ -249,8 +249,8 @@ subtest 'ir-convert pronto to mode2' => sub {
     my ($out, $exit) = run_script('ir-convert', '--from', 'pronto',
         '--to', 'mode2', '--in', $file);
     is($exit, 0, 'exits 0');
-    like($out, qr/^pulse 9\d{3}/m, 'mode2 starts with ~9000 us pulse');
-    like($out, qr/^space 4\d{3}/m, 'second line is ~4500 us space');
+    like($out, qr/^pulse 9\d{3}/m, 'mode2 starts with ~9000 µs pulse');
+    like($out, qr/^space 4\d{3}/m, 'second line is ~4500 µs space');
 };
 
 subtest 'ir-convert mode2 to tasmota' => sub {

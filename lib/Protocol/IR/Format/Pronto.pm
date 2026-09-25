@@ -117,6 +117,25 @@ C<Protocol::IR::Format::Pronto> encodes L<Protocol::IR::Code> objects into Pront
 and decodes Pronto Hex back into L<Protocol::IR::Code> objects. Only the I<raw> form
 (header C<0000>) is supported.
 
+=over 4
+
+=item Example Pronto Hex (a 32-bit NEC transmission)
+
+    0000 006D 0022 0000 0157 00AC 0015 0015 0015 0015 0015 0015 0015 0015 \
+    0015 0040 0015 0015 0015 0015 0015 0015 0015 0040 0015 0040 0015 0040 \
+    0015 0040 0015 0015 0015 0040 0015 0040 0015 0040 0015 0015 0015 0015 \
+    0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0015 0040 \
+    0015 0040 0015 0040 0015 0040 0015 0040 0015 0040 0015 0040 0015 0040 \
+    0015 0689
+
+The fields are the raw-format marker (C<0000>), the carrier frequency word
+(C<006D>), the burst-pair counts for the one-time and repeat sequences
+(C<0022 0000>), then that many mark/space pulse-count pairs, the final value
+being the trailing stop bit. See the IR Scrutinizer glossary for the full
+field layout (L<http://www.harctoolbox.org/Glossary.html>).
+
+=back
+
 The carrier frequency word is stored in the frequency field and converted
 to a period in microseconds: the pulse count stored for each mark/space is
 the duration in carrier cycles, so the actual duration depends on the

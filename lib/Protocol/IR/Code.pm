@@ -83,6 +83,8 @@ sub reverse_byte {
 
 1;
 
+=encoding utf8
+
 =head1 NAME
 
 Protocol::IR::Code - Intermediate representation of an IR remote control code
@@ -213,6 +215,27 @@ C<< Protocol::IR::Code::reverse_byte($val) >>.
 Source code: L<https://github.com/bwarden/perl-protocol-ir>
 
 Bug reports and feature requests: L<https://github.com/bwarden/perl-protocol-ir/issues>
+
+=head1 RELATED PROJECTS
+
+L<Protocol::IR::Code> trades formats with the IR ecosystem rather than
+reinventing it:
+
+=over 4
+
+=item * LIRC -- L<remote definitions|https://www.lirc.org/>, and the L<mode2|Protocol::IR::Format::Mode2> capture tool
+
+=item * Tasmota -- L<IR send/receive and RawData|https://tasmota.github.io/docs/Tasmota-IR/>, built on L<IRremoteESP8266|https://github.com/crankyoldgit/IRremoteESP8266>
+
+=item * IRDB -- L<the community button/CSV database|https://github.com/probonopd/irdb>
+
+=item * HAIR -- L<the Home Assistant IR integration and wig format|https://github.com/DAB-LABS/HAIR>
+
+=item * Global Cache -- L<IR database exports|https://www.globalcache.com/>
+
+=item * IR Scrutinizer -- L<Pronto Hex format glossary|http://www.harctoolbox.org/Glossary.html>
+
+=back
 
 =head1 AUTHOR
 

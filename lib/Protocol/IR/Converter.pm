@@ -46,15 +46,15 @@ sub new {
     #
     #   48-NEC1/48-NEC2 after NEC - the 48-bit frames share NEC's 9000/4500
     #   us header, but fail the 32-bit stop check (pair 33 is a data bit, so
-    #   its space never reaches the 3000 us threshold), so they only reach
+    #   its space never reaches the 3000 µs threshold), so they only reach
     #   the 48-bit decoders. 48-NEC1 before 48-NEC2: single frames are
     #   timing-identical, so the base variant absorbs the timing decode.
     #
-    #   JVC before JVC-48 - JVC-48's 3456/1728 us header is rejected by the
-    #   32-bit JVC header check (7000-9800 us), so it only reaches the
+    #   JVC before JVC-48 - JVC-48's 3456/1728 µs header is rejected by the
+    #   32-bit JVC header check (7000-9800 µs), so it only reaches the
     #   48-bit decoder.
     #
-    #   SAMSUNG before NECX1/NECX2 - NECx frames use Samsung's 4500/4500 us
+    #   SAMSUNG before NECX1/NECX2 - NECx frames use Samsung's 4500/4500 µs
     #   half header, so the two families share a header and bit timing. A
     #   single-frame NECx1/NECx2 capture is therefore only distinguished from
     #   SAMSUNG by the Samsung byte structure (address repeated, command
@@ -65,14 +65,14 @@ sub new {
     #   decoder and reports the same capture as UNKNOWN; ours names the
     #   protocol it recognizes.)
     #
-    #   SAMSUNG before SAMSUNG36 - SAMSUNG's stop check (a >= 3000 us space)
+    #   SAMSUNG before SAMSUNG36 - SAMSUNG's stop check (a >= 3000 µs space)
     #   rejects a 36-bit frame's mid-frame pairs, so SAMSUNG36 is only
     #   reached when its 39-pair framing matches.
     #
     #   SAMSUNG20 last - its 22-pair frames cannot match the 34-pair
     #   minimums of SAMSUNG/NEC or the 39-pair minimum of SAMSUNG36.
     #
-    #   MWM last - MWM frames have no header at all (a 417 us start mark),
+    #   MWM last - MWM frames have no header at all (a 417 µs start mark),
     #   so every other decoder's header check rejects them first, and MWM's
     #   strict tick matching rejects any header-bearing frame in turn.
     $self->register_protocol('NEC',       'Protocol::IR::Proto::NEC');
@@ -131,7 +131,7 @@ sub get_protocols {
 # Cross-protocol mappings: protocols with identical timing and compatible
 # frame layouts but different field naming conventions.
 #
-# NECX2 <-> SAMSUNG: same 4500/4500 us header, 560/1680 us bit timing,
+# NECX2 <-> SAMSUNG: same 4500/4500 µs header, 560/1680 µs bit timing,
 # 32 bits, per-byte LSB-first.  Samsung enforces addr,addr,cmd,~cmd
 # while NECX2 allows addr,subaddr,cmd,~cmd.  The Samsung address is the
 # bit-reversal of the NECX2 device byte, and likewise for the command.
@@ -229,6 +229,8 @@ sub import_format {
 }
 
 1;
+
+=encoding utf8
 
 =head1 NAME
 
@@ -445,7 +447,7 @@ supports:
 
 =item SAMSUNG <-> NECX2
 
-Both protocols share identical 4500/4500 us half-header timing and 32-bit
+Both protocols share identical 4500/4500 µs half-header timing and 32-bit
 LSB-first encoding, but name the fields differently.  The Samsung address
 is the bit-reversal of the NECX2 device byte, and likewise for the
 command/function byte.  See L<Protocol::IR::Proto::SAMSUNG/CROSS-PROTOCOL MAPPING>
