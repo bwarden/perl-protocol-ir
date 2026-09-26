@@ -2,6 +2,13 @@ Revision history for Protocol::IR::Code
 
 {{$NEXT}}
 
+    - Relicense the distribution as the GNU General Public License, version 2
+      or later, replacing the LGPL 2.1 it was published under through 1.2. The
+      SAMSUNG, SAMSUNG20 and SAMSUNG36 protocols are ported from
+      IRremoteESP8266's GPLv2 code, so GPLv2 or later is the grant those
+      derived files can carry; versions already on CPAN stay under the LGPL
+      2.1 they shipped with.
+
 1.2 2026-09-25T19:59:15Z
 
     - Fix the documented source of a code's send_count. The 1.0 entry (and the

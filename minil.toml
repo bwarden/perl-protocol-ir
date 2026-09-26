@@ -1,7 +1,7 @@
 name = "Protocol-IR-Code"
 module_maker = "ExtUtilsMakeMaker"
 copyright_holder = "Brett T. Warden"
-license = "lgpl_2_1"
+license = "gpl_2"
 tag_format = "v%v"
 
 [release]
