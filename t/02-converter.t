@@ -23,7 +23,8 @@ is_deeply(\@order, ['Protocol::IR::Proto::NEC', 'Protocol::IR::Proto::NEC2',
     'Protocol::IR::Proto::SAMSUNG', 'Protocol::IR::Proto::SAMSUNG36',
     'Protocol::IR::Proto::SAMSUNG20', 'Protocol::IR::Proto::NECX1',
     'Protocol::IR::Proto::NECX2', 'Protocol::IR::Proto::MWM',
-    'Protocol::IR::Proto::RC5', 'Protocol::IR::TestProto'],
+    'Protocol::IR::Proto::RC5', 'Protocol::IR::Proto::RC6',
+    'Protocol::IR::TestProto'],
     'get_protocols preserves registration order');
 
 eval { $converter->import_code('BOGUS', '0x00'); };

@@ -18,6 +18,7 @@ use Protocol::IR::Proto::NECX1;
 use Protocol::IR::Proto::NECX2;
 use Protocol::IR::Proto::MWM;
 use Protocol::IR::Proto::RC5;
+use Protocol::IR::Proto::RC6;
 use Protocol::IR::Proto::Panasonic;
 use Protocol::IR::Proto::Sony;
 use Protocol::IR::Format::Pronto;
@@ -95,6 +96,7 @@ sub new {
     $self->register_protocol('NECX2',     'Protocol::IR::Proto::NECX2');
     $self->register_protocol('MWM',       'Protocol::IR::Proto::MWM');
     $self->register_protocol('RC5',      'Protocol::IR::Proto::RC5');
+    $self->register_protocol('RC6',      'Protocol::IR::Proto::RC6');
 
     # Formats
     $self->register_format('Pronto', 'Protocol::IR::Format::Pronto');
@@ -418,6 +420,7 @@ unregistered format.
 =head2 register_protocol
 
     $converter->register_protocol('RC5', 'Protocol::IR::RC5');
+    $self->register_protocol('RC6',      'Protocol::IR::Proto::RC6');
 
 Registers a protocol handler class under a name. See L</"EXTENDING THE
 FRAMEWORK">.
@@ -504,6 +507,7 @@ into a Pronto Hex string.
 Register it in C<Protocol::IR::Converter::new()>:
 
     $self->register_protocol('RC5', 'Protocol::IR::RC5');
+    $self->register_protocol('RC6',      'Protocol::IR::Proto::RC6');
 
 =head2 Adding a new format (Protocol::IR::Format::NAME)
 
