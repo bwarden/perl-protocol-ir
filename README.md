@@ -74,9 +74,9 @@ handlers; you normally do not construct `Protocol::IR::Code` objects directly.
 - send\_count
 
     How many times the whole signal transmits per press (the wig's `send_count`,
-    the repeat hint a JSON dump's keycode carries).  Zero means the source carried
-    no repeat count, so a wig export omits `send_count` and the default single
-    press is assumed.
+    the device's `timing.pressMinRepeats` for a JSON dump import).  Zero means
+    the source carried no repeat count, so a wig export omits `send_count` and
+    the default single press is assumed.
 
 - bypass\_protocol
 
