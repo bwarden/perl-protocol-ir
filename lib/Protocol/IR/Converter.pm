@@ -17,6 +17,7 @@ use Protocol::IR::Proto::SAMSUNG36;
 use Protocol::IR::Proto::NECX1;
 use Protocol::IR::Proto::NECX2;
 use Protocol::IR::Proto::MWM;
+use Protocol::IR::Proto::RC5;
 use Protocol::IR::Proto::Panasonic;
 use Protocol::IR::Proto::Sony;
 use Protocol::IR::Format::Pronto;
@@ -93,6 +94,7 @@ sub new {
     $self->register_protocol('NECX1',     'Protocol::IR::Proto::NECX1');
     $self->register_protocol('NECX2',     'Protocol::IR::Proto::NECX2');
     $self->register_protocol('MWM',       'Protocol::IR::Proto::MWM');
+    $self->register_protocol('RC5',      'Protocol::IR::Proto::RC5');
 
     # Formats
     $self->register_format('Pronto', 'Protocol::IR::Format::Pronto');

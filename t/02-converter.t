@@ -10,8 +10,8 @@ my $converter = Protocol::IR::Converter->new();
 is($converter->get_protocol('nec'), 'Protocol::IR::Proto::NEC', 'protocol lookup is case-insensitive');
 is($converter->get_protocol('JVC'), 'Protocol::IR::Proto::JVC', 'protocol lookup by name');
 
-$converter->register_protocol('RC5', 'Protocol::IR::RC5');
-is($converter->get_protocol('RC5'), 'Protocol::IR::RC5', 'register_protocol stores handler');
+$converter->register_protocol('TESTPROTO', 'Protocol::IR::TestProto');
+is($converter->get_protocol('TESTPROTO'), 'Protocol::IR::TestProto', 'register_protocol stores handler');
 
 my @order = $converter->get_protocols();
 is_deeply(\@order, ['Protocol::IR::Proto::NEC', 'Protocol::IR::Proto::NEC2',
@@ -22,7 +22,8 @@ is_deeply(\@order, ['Protocol::IR::Proto::NEC', 'Protocol::IR::Proto::NEC2',
     'Protocol::IR::Proto::Sony12',
     'Protocol::IR::Proto::SAMSUNG', 'Protocol::IR::Proto::SAMSUNG36',
     'Protocol::IR::Proto::SAMSUNG20', 'Protocol::IR::Proto::NECX1',
-    'Protocol::IR::Proto::NECX2', 'Protocol::IR::Proto::MWM', 'Protocol::IR::RC5'],
+    'Protocol::IR::Proto::NECX2', 'Protocol::IR::Proto::MWM',
+    'Protocol::IR::Proto::RC5', 'Protocol::IR::TestProto'],
     'get_protocols preserves registration order');
 
 eval { $converter->import_code('BOGUS', '0x00'); };
