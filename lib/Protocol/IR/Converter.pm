@@ -17,6 +17,8 @@ use Protocol::IR::Proto::SAMSUNG36;
 use Protocol::IR::Proto::NECX1;
 use Protocol::IR::Proto::NECX2;
 use Protocol::IR::Proto::MWM;
+use Protocol::IR::Proto::Panasonic;
+use Protocol::IR::Proto::Sony;
 use Protocol::IR::Format::Pronto;
 use Protocol::IR::Format::CSV;
 use Protocol::IR::Format::Wig;
@@ -82,6 +84,9 @@ sub new {
     $self->register_protocol('JVC',       'Protocol::IR::Proto::JVC');
     $self->register_protocol('JVC-48',    'Protocol::IR::Proto::JVC48');
     $self->register_protocol('PANASONIC', 'Protocol::IR::Proto::Panasonic');
+    $self->register_protocol('SONY20',     'Protocol::IR::Proto::Sony20');
+    $self->register_protocol('SONY15',     'Protocol::IR::Proto::Sony15');
+    $self->register_protocol('SONY12',     'Protocol::IR::Proto::Sony12');
     $self->register_protocol('SAMSUNG',   'Protocol::IR::Proto::SAMSUNG');
     $self->register_protocol('SAMSUNG36', 'Protocol::IR::Proto::SAMSUNG36');
     $self->register_protocol('SAMSUNG20', 'Protocol::IR::Proto::SAMSUNG20');
