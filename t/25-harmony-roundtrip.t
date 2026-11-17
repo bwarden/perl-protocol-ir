@@ -22,5 +22,7 @@ for my $proto (sort keys %prontos) {
     my $exported = $converter->export_code($code, 'Pronto');
     my $back = $converter->import_format('Pronto', $exported);
     is($back->protocol, $proto, "Harmony pronto round-trips for $proto");
+    is($back->address, $code->address, "Harmony pronto round-trips address for $proto");
+    is($back->command, $code->command, "Harmony pronto round-trips command for $proto");
 }
 done_testing;
