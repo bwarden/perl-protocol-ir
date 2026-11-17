@@ -25,4 +25,14 @@ for my $proto (sort keys %prontos) {
     is($back->address, $code->address, "Harmony pronto round-trips address for $proto");
     is($back->command, $code->command, "Harmony pronto round-trips command for $proto");
 }
+# Expected decoded values for each Harmony pronto (for review/correction):
+# JVC: addr=115 cmd=119
+# RC5: addr=1 cmd=0
+# RC6: addr=4 cmd=0
+# SAMSUNG: addr=224 cmd=136
+# SONY12: addr=1 cmd=9
+# SONY15: addr=151 cmd=29
+# SONY20: addr=26 cmd=9
+# NEC: addr=210 cmd=71
+
 done_testing;
