@@ -20,6 +20,7 @@ use Protocol::IR::Proto::MWM;
 use Protocol::IR::Proto::RC5;
 use Protocol::IR::Proto::RC6;
 use Protocol::IR::Proto::Denon;
+use Protocol::IR::Proto::Aiwa;
 use Protocol::IR::Proto::Panasonic;
 use Protocol::IR::Proto::Sony;
 use Protocol::IR::Format::Pronto;
@@ -99,6 +100,7 @@ sub new {
     $self->register_protocol('RC5',      'Protocol::IR::Proto::RC5');
     $self->register_protocol('RC6',      'Protocol::IR::Proto::RC6');
     $self->register_protocol('DENON',   'Protocol::IR::Proto::Denon');
+    $self->register_protocol('AIWA',     'Protocol::IR::Proto::Aiwa');
     $self->register_protocol('DENON-K', 'Protocol::IR::Proto::DenonK');
     $self->register_protocol('DENON{1}','Protocol::IR::Proto::Denon1');
 
@@ -426,6 +428,7 @@ unregistered format.
     $converter->register_protocol('RC5', 'Protocol::IR::RC5');
     $self->register_protocol('RC6',      'Protocol::IR::Proto::RC6');
     $self->register_protocol('DENON',   'Protocol::IR::Proto::Denon');
+    $self->register_protocol('AIWA',     'Protocol::IR::Proto::Aiwa');
     $self->register_protocol('DENON-K', 'Protocol::IR::Proto::DenonK');
     $self->register_protocol('DENON{1}','Protocol::IR::Proto::Denon1');
 
@@ -516,6 +519,7 @@ Register it in C<Protocol::IR::Converter::new()>:
     $self->register_protocol('RC5', 'Protocol::IR::RC5');
     $self->register_protocol('RC6',      'Protocol::IR::Proto::RC6');
     $self->register_protocol('DENON',   'Protocol::IR::Proto::Denon');
+    $self->register_protocol('AIWA',     'Protocol::IR::Proto::Aiwa');
     $self->register_protocol('DENON-K', 'Protocol::IR::Proto::DenonK');
     $self->register_protocol('DENON{1}','Protocol::IR::Proto::Denon1');
 
