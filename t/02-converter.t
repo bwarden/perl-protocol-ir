@@ -24,7 +24,7 @@ is_deeply(\@order, ['Protocol::IR::Proto::Pioneer', 'Protocol::IR::Proto::NEC', 
     'Protocol::IR::Proto::SAMSUNG20', 'Protocol::IR::Proto::NECX1',
     'Protocol::IR::Proto::NECX2', 'Protocol::IR::Proto::MWM',
     'Protocol::IR::Proto::RC5', 'Protocol::IR::Proto::RC6',
-    'Protocol::IR::Proto::Denon', 'Protocol::IR::Proto::Aiwa',
+    'Protocol::IR::Proto::Denon', 'Protocol::IR::Proto::Aiwa', 'Protocol::IR::Proto::Dish',
     'Protocol::IR::Proto::DenonK', 'Protocol::IR::Proto::Denon1', 'Protocol::IR::TestProto'],
     'get_protocols preserves registration order');
 

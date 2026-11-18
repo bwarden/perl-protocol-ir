@@ -6,6 +6,7 @@ our $VERSION = '1.2';
 
 use Protocol::IR::Code;
 use Protocol::IR::Proto::Aiwa;
+use Protocol::IR::Proto::Dish;
 use Protocol::IR::Proto::Pioneer;
 use Protocol::IR::Proto::Denon;
 use Protocol::IR::Proto::JVC;
@@ -103,6 +104,7 @@ sub new {
     $self->register_protocol('RC6',      'Protocol::IR::Proto::RC6');
     $self->register_protocol('DENON',   'Protocol::IR::Proto::Denon');
     $self->register_protocol('AIWA',     'Protocol::IR::Proto::Aiwa');
+    $self->register_protocol('DISH_NETWORK', 'Protocol::IR::Proto::Dish');
     $self->register_protocol('DENON-K', 'Protocol::IR::Proto::DenonK');
     $self->register_protocol('DENON{1}','Protocol::IR::Proto::Denon1');
 
@@ -431,6 +433,7 @@ unregistered format.
     $self->register_protocol('RC6',      'Protocol::IR::Proto::RC6');
     $self->register_protocol('DENON',   'Protocol::IR::Proto::Denon');
     $self->register_protocol('AIWA',     'Protocol::IR::Proto::Aiwa');
+    $self->register_protocol('DISH_NETWORK', 'Protocol::IR::Proto::Dish');
     $self->register_protocol('DENON-K', 'Protocol::IR::Proto::DenonK');
     $self->register_protocol('DENON{1}','Protocol::IR::Proto::Denon1');
 
@@ -522,6 +525,7 @@ Register it in C<Protocol::IR::Converter::new()>:
     $self->register_protocol('RC6',      'Protocol::IR::Proto::RC6');
     $self->register_protocol('DENON',   'Protocol::IR::Proto::Denon');
     $self->register_protocol('AIWA',     'Protocol::IR::Proto::Aiwa');
+    $self->register_protocol('DISH_NETWORK', 'Protocol::IR::Proto::Dish');
     $self->register_protocol('DENON-K', 'Protocol::IR::Proto::DenonK');
     $self->register_protocol('DENON{1}','Protocol::IR::Proto::Denon1');
 
