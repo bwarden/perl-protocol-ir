@@ -41,6 +41,11 @@ handlers; you normally do not construct `Protocol::IR::Code` objects directly.
 
     Protocol name (e.g. `NEC`), or `UNKNOWN` for undecoded timing data.
 
+Supported protocols (registered by default): NEC, NEC2, 48-NEC1, 48-NEC2, JVC,
+JVC-48, PANASONIC, SAMSUNG, SAMSUNG20, SAMSUNG36, NECX1, NECX2, MWM, SONY12,
+SONY15, SONY20, RC5, RC6, DENON, DENON-K, DENON{1}, AIWA, G.I.Cable,
+DISH_NETWORK, Pioneer, Mitsubishi, SHARP.
+
 - bits
 
     Number of data bits in the frame.
