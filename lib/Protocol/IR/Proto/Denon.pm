@@ -99,3 +99,13 @@ sub to_pronto {
 }
 
 1;
+
+package Protocol::IR::Proto::DenonK;
+use base 'Protocol::IR::Proto::Denon';
+sub _protocol_name { 'DENON-K' }
+
+package Protocol::IR::Proto::Denon1;
+use base 'Protocol::IR::Proto::Denon';
+sub _protocol_name { 'DENON{1}' }
+
+1;

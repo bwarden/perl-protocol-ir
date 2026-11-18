@@ -99,6 +99,8 @@ sub new {
     $self->register_protocol('RC5',      'Protocol::IR::Proto::RC5');
     $self->register_protocol('RC6',      'Protocol::IR::Proto::RC6');
     $self->register_protocol('DENON',   'Protocol::IR::Proto::Denon');
+    $self->register_protocol('DENON-K', 'Protocol::IR::Proto::DenonK');
+    $self->register_protocol('DENON{1}','Protocol::IR::Proto::Denon1');
 
     # Formats
     $self->register_format('Pronto', 'Protocol::IR::Format::Pronto');
@@ -424,6 +426,8 @@ unregistered format.
     $converter->register_protocol('RC5', 'Protocol::IR::RC5');
     $self->register_protocol('RC6',      'Protocol::IR::Proto::RC6');
     $self->register_protocol('DENON',   'Protocol::IR::Proto::Denon');
+    $self->register_protocol('DENON-K', 'Protocol::IR::Proto::DenonK');
+    $self->register_protocol('DENON{1}','Protocol::IR::Proto::Denon1');
 
 Registers a protocol handler class under a name. See L</"EXTENDING THE
 FRAMEWORK">.
@@ -512,6 +516,8 @@ Register it in C<Protocol::IR::Converter::new()>:
     $self->register_protocol('RC5', 'Protocol::IR::RC5');
     $self->register_protocol('RC6',      'Protocol::IR::Proto::RC6');
     $self->register_protocol('DENON',   'Protocol::IR::Proto::Denon');
+    $self->register_protocol('DENON-K', 'Protocol::IR::Proto::DenonK');
+    $self->register_protocol('DENON{1}','Protocol::IR::Proto::Denon1');
 
 =head2 Adding a new format (Protocol::IR::Format::NAME)
 
