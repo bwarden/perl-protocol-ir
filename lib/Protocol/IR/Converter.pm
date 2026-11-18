@@ -6,6 +6,7 @@ our $VERSION = '1.2';
 
 use Protocol::IR::Code;
 use Protocol::IR::Proto::Aiwa;
+use Protocol::IR::Proto::Pioneer;
 use Protocol::IR::Proto::Denon;
 use Protocol::IR::Proto::JVC;
 use Protocol::IR::Proto::JVC48;
@@ -81,6 +82,7 @@ sub new {
     #   MWM last - MWM frames have no header at all (a 417 µs start mark),
     #   so every other decoder's header check rejects them first, and MWM's
     #   strict tick matching rejects any header-bearing frame in turn.
+    $self->register_protocol('PIONEER', 'Protocol::IR::Proto::Pioneer');
     $self->register_protocol('NEC',       'Protocol::IR::Proto::NEC');
     $self->register_protocol('NEC2',      'Protocol::IR::Proto::NEC2');
     $self->register_protocol('48-NEC1',   'Protocol::IR::Proto::NEC48');

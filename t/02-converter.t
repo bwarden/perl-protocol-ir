@@ -14,7 +14,7 @@ $converter->register_protocol('TESTPROTO', 'Protocol::IR::TestProto');
 is($converter->get_protocol('TESTPROTO'), 'Protocol::IR::TestProto', 'register_protocol stores handler');
 
 my @order = $converter->get_protocols();
-is_deeply(\@order, ['Protocol::IR::Proto::NEC', 'Protocol::IR::Proto::NEC2',
+is_deeply(\@order, ['Protocol::IR::Proto::Pioneer', 'Protocol::IR::Proto::NEC', 'Protocol::IR::Proto::NEC2',
     'Protocol::IR::Proto::NEC48', 'Protocol::IR::Proto::NEC482',
     'Protocol::IR::Proto::JVC', 'Protocol::IR::Proto::JVC48',
     'Protocol::IR::Proto::Panasonic',
