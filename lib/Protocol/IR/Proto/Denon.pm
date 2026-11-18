@@ -11,11 +11,13 @@ sub _pack {
     return (($addr & 0x1f) << 10) | (($cmd & 0xff) << 2);
 }
 
+sub _protocol_name { 'DENON' }
+
 sub decode_raw {
     my ($class, $raw) = @_;
     my $val = $raw =~ /^0x/i ? hex($raw) : $raw + 0;
     return Protocol::IR::Code->new(
-        protocol   => 'DENON',
+        protocol   => $class->_protocol_name,
         bits       => 15,
         address    => ($val >> 10) & 0x1f,
         subaddress => -1,
@@ -34,7 +36,7 @@ sub decode_params {
     $cmd &= 0xff;
     my $data = $class->_pack($addr, $cmd);
     return Protocol::IR::Code->new(
-        protocol   => 'DENON',
+        protocol   => $class->_protocol_name,
         bits       => 15,
         address    => $addr,
         subaddress => -1,
@@ -58,7 +60,7 @@ sub decode_timing {
         $data = ($data << 1) | $bit;
     }
     return Protocol::IR::Code->new(
-        protocol   => 'DENON',
+        protocol   => $class->_protocol_name,
         bits       => 15,
         address    => ($data >> 10) & 0x1f,
         subaddress => -1,

@@ -11,6 +11,7 @@ use Protocol::IR::Proto::Mitsubishi;
 use Protocol::IR::Proto::Dish;
 use Protocol::IR::Proto::Pioneer;
 use Protocol::IR::Proto::Denon;
+use Protocol::IR::Proto::Sharp;
 use Protocol::IR::Proto::JVC;
 use Protocol::IR::Proto::JVC48;
 use Protocol::IR::Proto::MWM;
@@ -106,6 +107,7 @@ sub new {
     $self->register_protocol('RC6',      'Protocol::IR::Proto::RC6');
     $self->register_protocol('MITSUBISHI', 'Protocol::IR::Proto::Mitsubishi');
     $self->register_protocol('DENON',   'Protocol::IR::Proto::Denon');
+    $self->register_protocol('SHARP',    'Protocol::IR::Proto::Sharp');
     $self->register_protocol('AIWA',     'Protocol::IR::Proto::Aiwa');
     $self->register_protocol('G.I.CABLE', 'Protocol::IR::Proto::GICable');
     $self->register_protocol('DISH_NETWORK', 'Protocol::IR::Proto::Dish');
