@@ -7,6 +7,7 @@ our $VERSION = '1.2';
 use Protocol::IR::Code;
 use Protocol::IR::Proto::Aiwa;
 use Protocol::IR::Proto::GICable;
+use Protocol::IR::Proto::Mitsubishi;
 use Protocol::IR::Proto::Dish;
 use Protocol::IR::Proto::Pioneer;
 use Protocol::IR::Proto::Denon;
@@ -103,6 +104,7 @@ sub new {
     $self->register_protocol('MWM',       'Protocol::IR::Proto::MWM');
     $self->register_protocol('RC5',      'Protocol::IR::Proto::RC5');
     $self->register_protocol('RC6',      'Protocol::IR::Proto::RC6');
+    $self->register_protocol('MITSUBISHI', 'Protocol::IR::Proto::Mitsubishi');
     $self->register_protocol('DENON',   'Protocol::IR::Proto::Denon');
     $self->register_protocol('AIWA',     'Protocol::IR::Proto::Aiwa');
     $self->register_protocol('G.I.CABLE', 'Protocol::IR::Proto::GICable');
@@ -433,6 +435,7 @@ unregistered format.
 
     $converter->register_protocol('RC5', 'Protocol::IR::RC5');
     $self->register_protocol('RC6',      'Protocol::IR::Proto::RC6');
+    $self->register_protocol('MITSUBISHI', 'Protocol::IR::Proto::Mitsubishi');
     $self->register_protocol('DENON',   'Protocol::IR::Proto::Denon');
     $self->register_protocol('AIWA',     'Protocol::IR::Proto::Aiwa');
     $self->register_protocol('G.I.CABLE', 'Protocol::IR::Proto::GICable');
@@ -526,6 +529,7 @@ Register it in C<Protocol::IR::Converter::new()>:
 
     $self->register_protocol('RC5', 'Protocol::IR::RC5');
     $self->register_protocol('RC6',      'Protocol::IR::Proto::RC6');
+    $self->register_protocol('MITSUBISHI', 'Protocol::IR::Proto::Mitsubishi');
     $self->register_protocol('DENON',   'Protocol::IR::Proto::Denon');
     $self->register_protocol('AIWA',     'Protocol::IR::Proto::Aiwa');
     $self->register_protocol('G.I.CABLE', 'Protocol::IR::Proto::GICable');
