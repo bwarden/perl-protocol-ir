@@ -2,7 +2,7 @@ package Protocol::IR::Proto::SAMSUNG20;
 use strict;
 use warnings;
 
-our $VERSION = '1.2';
+our $VERSION = '1.3';
 use Protocol::IR::Code;
 
 # Protocol::IR::Proto::SAMSUNG20 is the SAMSUNG20 protocol handler
@@ -160,7 +160,7 @@ Protocol::IR::Proto::SAMSUNG20 - SAMSUNG20 protocol handler (20-bit AC)
 
 =head1 VERSION
 
-version 1.2
+version 1.3
 
 =head1 SYNOPSIS
 

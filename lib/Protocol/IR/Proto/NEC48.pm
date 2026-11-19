@@ -2,7 +2,7 @@ package Protocol::IR::Proto::NEC48;
 use strict;
 use warnings;
 
-our $VERSION = '1.2';
+our $VERSION = '1.3';
 use Protocol::IR::Code;
 
 # Protocol::IR::Proto::NEC48 is the base class for the 48-bit NEC family
@@ -211,7 +211,7 @@ Protocol::IR::Proto::NEC48 - 48-NEC1 protocol handler (48-bit NEC family base)
 
 =head1 VERSION
 
-version 1.2
+version 1.3
 
 =head1 SYNOPSIS
 

@@ -1,11 +1,11 @@
 package Protocol::IR::Proto::Sony;
-our $VERSION = '1.2';
+our $VERSION = '1.3';
 
 package Protocol::IR::Proto::Sony12;
 use strict;
 use warnings;
 
-our $VERSION = '1.2';
+our $VERSION = '1.3';
 
 use Protocol::IR::Code;
 
@@ -170,6 +170,6 @@ Protocol::IR::Proto::Sony - IR protocol handler
 
 =head1 VERSION
 
-version 1.2
+version 1.3
 
 =cut

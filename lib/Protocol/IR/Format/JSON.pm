@@ -2,7 +2,7 @@ package Protocol::IR::Format::JSON;
 use strict;
 use warnings;
 
-our $VERSION = '1.2';
+our $VERSION = '1.3';
 
 use JSON::PP;
 use File::Spec;
@@ -145,7 +145,7 @@ Protocol::IR::Format::JSON - proprietary JSON IR database dump import
 
 =head1 VERSION
 
-version 1.2
+version 1.3
 
 =head1 SYNOPSIS
 

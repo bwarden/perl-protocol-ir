@@ -2,6 +2,8 @@ package Protocol::IR::Proto::Pioneer;
 use strict;
 use warnings;
 
+our $VERSION = '1.3';
+
 use Protocol::IR::Code;
 use Protocol::IR::Proto::NEC;
 
@@ -96,3 +98,13 @@ sub to_pronto {
 }
 
 1;
+
+=head1 NAME
+
+Protocol::IR::Proto::Pioneer - IR protocol handler
+
+=head1 VERSION
+
+version 1.3
+
+=cut

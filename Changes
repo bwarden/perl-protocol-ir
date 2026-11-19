@@ -2,6 +2,8 @@ Revision history for Protocol::IR::Code
 
 {{$NEXT}}
 
+1.3 2026-11-19T01:29:30Z
+
     - Repeat count for JSON dump imports now comes from the device's
       timing.pressMinRepeats (the Harmony hub's source, defaulting to 3)
       instead of the keycode's trailing ":N", which is a constant on 99.95%

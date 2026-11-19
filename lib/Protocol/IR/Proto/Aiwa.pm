@@ -2,6 +2,8 @@ package Protocol::IR::Proto::Aiwa;
 use strict;
 use warnings;
 
+our $VERSION = '1.3';
+
 use Protocol::IR::Code;
 
 my $PRE_DATA = 0x1D8113F;
@@ -102,3 +104,13 @@ sub to_pronto {
 }
 
 1;
+
+=head1 NAME
+
+Protocol::IR::Proto::Aiwa - IR protocol handler
+
+=head1 VERSION
+
+version 1.3
+
+=cut
