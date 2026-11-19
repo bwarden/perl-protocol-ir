@@ -4,6 +4,7 @@ use warnings;
 # 48-bit hex literals exceed the 32-bit range that triggers Perl's
 # "portable" warning; the wide protocols use them by design.
 no warnings 'portable';
+no warnings 'overflow';
 use Test::More;
 use FindBin;
 use lib "$FindBin::Bin/lib";
