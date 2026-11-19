@@ -2,7 +2,7 @@ package Protocol::IR::Proto::Aiwa;
 use strict;
 use warnings;
 
-our $VERSION = '1.3';
+our $VERSION = '1.4';
 
 use Protocol::IR::Code;
 
@@ -111,6 +111,6 @@ Protocol::IR::Proto::Aiwa - IR protocol handler
 
 =head1 VERSION
 
-version 1.3
+version 1.4
 
 =cut

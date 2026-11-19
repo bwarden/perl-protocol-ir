@@ -2,7 +2,7 @@ package Protocol::IR::Converter;
 use strict;
 use warnings;
 
-our $VERSION = '1.3';
+our $VERSION = '1.4';
 
 use Protocol::IR::Code;
 use Protocol::IR::Proto::Aiwa;
@@ -267,7 +267,7 @@ Protocol::IR::Converter - Registry and manager for IR code protocols and formats
 
 =head1 VERSION
 
-version 1.3
+version 1.4
 
 =head1 SYNOPSIS
 
