@@ -86,6 +86,11 @@ sub new {
     #   MWM last - MWM frames have no header at all (a 417 µs start mark),
     #   so every other decoder's header check rejects them first, and MWM's
     #   strict tick matching rejects any header-bearing frame in turn.
+    # DECODE ORDER MATTERS: protocols are tried in registration order;
+    # a later protocol whose timing is a subset of an earlier one never matches.
+    # Register more specific / longer frames first (Pioneer before NEC,
+    # Mitsubishi before Denon, Denon before Sharp). Derivative protocols that
+    # share a timing signature (NECX1/NECX2 -> SAMSUNG) rely on this ordering.
     $self->register_protocol('PIONEER', 'Protocol::IR::Proto::Pioneer');
     $self->register_protocol('NEC',       'Protocol::IR::Proto::NEC');
     $self->register_protocol('NEC2',      'Protocol::IR::Proto::NEC2');
