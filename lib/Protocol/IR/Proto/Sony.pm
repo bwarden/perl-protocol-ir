@@ -1,6 +1,11 @@
+package Protocol::IR::Proto::Sony;
+our $VERSION = '1.2';
+
 package Protocol::IR::Proto::Sony12;
 use strict;
 use warnings;
+
+our $VERSION = '1.2';
 
 use Protocol::IR::Code;
 
@@ -158,3 +163,13 @@ sub extended_bits { 8 }
 sub _protocol_name { 'SONY20' }
 
 1;
+
+=head1 NAME
+
+Protocol::IR::Proto::Sony - IR protocol handler
+
+=head1 VERSION
+
+version 1.2
+
+=cut
