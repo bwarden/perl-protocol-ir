@@ -2,7 +2,7 @@ package Protocol::IR::Proto::Denon;
 use strict;
 use warnings;
 
-our $VERSION = '1.4';
+our $VERSION = '1.5';
 
 use Protocol::IR::Code;
 
@@ -120,6 +120,6 @@ Protocol::IR::Proto::Denon - IR protocol handler
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =cut

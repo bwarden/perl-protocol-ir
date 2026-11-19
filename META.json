@@ -67,7 +67,7 @@
          "web" : "https://github.com/bwarden/perl-protocol-ir"
       }
    },
-   "version" : "1.4",
+   "version" : "1.5",
    "x_contributors" : [
       "Brett T. Warden <brett.warden@gmail.com>"
    ],

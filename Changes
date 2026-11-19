@@ -2,6 +2,8 @@ Revision history for Protocol::IR::Code
 
 {{$NEXT}}
 
+1.5 2026-11-19T20:38:10Z
+
     - Fix integer overflow on 32-bit Perl in the wide-protocol handlers
       (NEC48/482, JVC-48, SAMSUNG36, Aiwa, Pioneer) by using Math::BigInt
       for frame data; remove overflow-warning suppression from tests.

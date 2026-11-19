@@ -2,7 +2,7 @@ package Protocol::IR::Proto::SAMSUNG36;
 use strict;
 use warnings;
 
-our $VERSION = '1.4';
+our $VERSION = '1.5';
 use Protocol::IR::Code;
 use Math::BigInt;
 
@@ -212,7 +212,7 @@ Protocol::IR::Proto::SAMSUNG36 - SAMSUNG36 protocol handler (36-bit)
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =head1 SYNOPSIS
 
