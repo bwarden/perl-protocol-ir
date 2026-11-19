@@ -40,8 +40,8 @@ for my $file (@files) {
             $line =~ s/\r$//;
             next if $line =~ /^\s*#/ || $line !~ /\S/;
 
-            my @col = split /\t/, $line;
-            is(scalar(@col), 10, "row " . ($rows + 1) . " has 10 columns")
+            my @col = split /\t/, $line, -1;
+            is(scalar(@col), 12, "row " . ($rows + 1) . " has 12 columns")
                 or next;
             my ($name, $proto2, $addr, $subaddr, $cmd, $pronto,
                 $dproto, $daddr, $dsub, $dcmd) = @col;
